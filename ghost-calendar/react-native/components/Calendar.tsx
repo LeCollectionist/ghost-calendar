@@ -6,6 +6,7 @@ import { useCalendar } from "../hooks/useCalendar";
 
 import { RangeType } from "./types";
 import { Month } from "./Month";
+import { Week } from "./Week";
 
 type CalendarComponentType = {
   bookingColors?: BookingColorType;
@@ -68,15 +69,14 @@ const CalendarComponent = ({
   return (
     <View
       style={{
-        flexDirection: "row",
-        justifyContent: "center",
         marginTop: 15,
-        marginLeft: 12,
-        marginRight: 12,
-        height: "100%",
       }}
     >
+      <Week locale={locale} />
       <FlatList
+        contentContainerStyle={{
+          paddingHorizontal: 12,
+        }}
         initialNumToRender={5}
         showsVerticalScrollIndicator={false}
         data={calendar.months}
@@ -85,12 +85,10 @@ const CalendarComponent = ({
           <Month
             month={month}
             index={index}
-            locale={locale}
             editMode={editMode}
             bookingDayHandler={bookingDayHandler}
             setPeriod={setPeriod}
             withInteraction={withInteraction}
-            calendar={calendar}
           />
         )}
       />
