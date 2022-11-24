@@ -22,7 +22,7 @@ export const Month = memo(
     withInteraction: boolean;
   }) => (
     <View key={`${month.id}${index}`}>
-      <View style={{ marginBottom: 10, marginTop: 20, paddingLeft: 19 }}>
+      <View style={{ marginBottom: 10, marginTop: 10, paddingLeft: 19 }}>
         <Text
           style={{
             fontWeight: "bold",
