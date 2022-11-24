@@ -8,21 +8,19 @@ import { EditModeDays } from "./EditModeDays";
 export const Month = memo(
   ({
     month,
-    index,
     editMode,
     bookingDayHandler,
     setPeriod,
     withInteraction,
   }: {
     month: MonthType;
-    index: number;
     editMode: boolean;
     bookingDayHandler?: (day: DayType) => void;
     setPeriod: (day: DayType) => void;
     withInteraction: boolean;
   }) => (
-    <View key={`${month.id}${index}`}>
-      <View style={{ marginBottom: 10, marginTop: 10, paddingLeft: 19 }}>
+    <>
+      <View style={{ marginBottom: 10, marginTop: 20, paddingLeft: 19 }}>
         <Text
           style={{
             fontWeight: "bold",
@@ -48,6 +46,6 @@ export const Month = memo(
           withInteraction={withInteraction}
         />
       )}
-    </View>
+    </>
   )
 );

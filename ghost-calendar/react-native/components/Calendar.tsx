@@ -82,14 +82,19 @@ const CalendarComponent = ({
         data={calendar.months}
         keyExtractor={(item) => String(item.id)}
         renderItem={({ item: month, index }) => (
-          <Month
-            month={month}
-            index={index}
-            editMode={editMode}
-            bookingDayHandler={bookingDayHandler}
-            setPeriod={setPeriod}
-            withInteraction={withInteraction}
-          />
+          <View key={`${month.id}${index}`}>
+            {index === 0 && <View style={{ marginTop: 20 }} />}
+            <Month
+              month={month}
+              editMode={editMode}
+              bookingDayHandler={bookingDayHandler}
+              setPeriod={setPeriod}
+              withInteraction={withInteraction}
+            />
+            {index === calendar.months.length - 1 && (
+              <View style={{ marginBottom: 80 }} />
+            )}
+          </View>
         )}
       />
     </View>
