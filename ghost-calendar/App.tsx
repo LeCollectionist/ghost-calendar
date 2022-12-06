@@ -17,7 +17,7 @@ export default function App() {
           if (range) setShowRange(range);
         }}
         locale="fr"
-        startDate={new Date(new Date().getFullYear(), 0, 1)}
+        startDate={new Date(new Date().getFullYear(), 11, 1)}
         endDate={new Date(new Date().getFullYear() + 2, 0, 1)}
         visualMonth={24}
         rangeDates={rangeDates}

@@ -29,9 +29,7 @@ export class CalendarPresenter extends Presenter<CalendarVM> {
   }
 
   private getNextMonth(date: Date, countMonth: number) {
-    if (date.getMonth() === 11) {
-      this.nextMonth = new Date(date.getFullYear() + 1, 0, 1);
-    } else if (countMonth === 0) {
+    if (countMonth === 0) {
       this.nextMonth = new Date(date.getFullYear(), date.getMonth(), 1);
     } else {
       this.nextMonth = new Date(date.getFullYear(), date.getMonth() + 1, 1);
