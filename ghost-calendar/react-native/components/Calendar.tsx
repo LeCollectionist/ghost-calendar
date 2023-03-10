@@ -21,7 +21,7 @@ type CalendarComponentType = {
   startDate: Date;
   visualMonth: number;
   withInteraction?: boolean;
-  onSelectedCheckInDate?: (day: DayType) => void;
+  onSelectedDay?: (days: DayType[]) => void;
 };
 
 const CalendarComponent = ({
@@ -37,7 +37,7 @@ const CalendarComponent = ({
   startDate,
   visualMonth,
   withInteraction = false,
-  onSelectedCheckInDate,
+  onSelectedDay,
 }: CalendarComponentType) => {
   const { calendar, setPeriod, resetCalendar } = useCalendar({
     bookingColors,
@@ -92,7 +92,7 @@ const CalendarComponent = ({
               bookingDayHandler={bookingDayHandler}
               setPeriod={setPeriod}
               withInteraction={withInteraction}
-              onSelectedCheckInDate={onSelectedCheckInDate}
+              onSelectedDay={onSelectedDay}
             />
             {index === calendar.months.length - 1 && (
               <View style={{ marginBottom: 80 }} />

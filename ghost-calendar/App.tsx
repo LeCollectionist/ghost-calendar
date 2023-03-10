@@ -31,9 +31,7 @@ export default function App() {
         endDate={endDateCalendar}
         visualMonth={24}
         rangeDates={rangeDates}
-        onSelectedCheckInDate={(checkInDate) =>
-          console.log("checkInDate", checkInDate)
-        }
+        onSelectedDay={(day) => console.log("day", day)}
       />
       {showRange && (
         <View
