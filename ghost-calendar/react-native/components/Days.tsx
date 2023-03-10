@@ -24,6 +24,7 @@ export type DayComponentType = {
   days: DayType[];
   setPeriod: (day: DayType) => void;
   withInteraction: boolean;
+  onSelectedCheckInDate?: (day: DayType) => void;
 };
 
 type CheckMarkerType = {
@@ -63,9 +64,11 @@ export const Days = memo(
     days,
     setPeriod,
     withInteraction,
+    onSelectedCheckInDate,
   }: DayComponentType) => {
     const onPress = (day: DayType) => {
       if (day.day) {
+        if (onSelectedCheckInDate) onSelectedCheckInDate(day);
         if (day.isBooking && bookingDayHandler) bookingDayHandler(day);
 
         if (withInteraction) {

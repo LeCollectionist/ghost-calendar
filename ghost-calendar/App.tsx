@@ -6,6 +6,12 @@ import {
   RangeType,
 } from "./react-native/components";
 
+const fullYear = new Date().getFullYear();
+const month = new Date().getMonth();
+
+const startDateCalendar = new Date(fullYear, month, 1);
+const endDateCalendar = new Date(fullYear + 1, month + 2, 1);
+
 export default function App() {
   const [showRange, setShowRange] = useState<RangeType | null>(null);
 
@@ -13,14 +19,21 @@ export default function App() {
     <View>
       <CalendarComponent
         editMode
+        bookingDayHandler={(booking) => {
+          console.log("booking", booking);
+        }}
         rangeMarkerHandler={(range) => {
+          console.log("range", range);
           if (range) setShowRange(range);
         }}
         locale="fr"
-        startDate={new Date(new Date().getFullYear(), 11, 1)}
-        endDate={new Date(new Date().getFullYear() + 2, 0, 1)}
+        startDate={startDateCalendar}
+        endDate={endDateCalendar}
         visualMonth={24}
         rangeDates={rangeDates}
+        onSelectedCheckInDate={(checkInDate) =>
+          console.log("checkInDate", checkInDate)
+        }
       />
       {showRange && (
         <View
