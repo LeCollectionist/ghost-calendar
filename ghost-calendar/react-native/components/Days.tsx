@@ -19,12 +19,14 @@ import {
 import { CurrentDayPointer } from "./CurrentDayPointer";
 import { CheckIn, CheckOut, CheckInCheckOut } from "./PeriodDelimiter";
 
+let daysT: DayType[] = [];
+
 export type DayComponentType = {
   bookingDayHandler?: (day: DayType) => void;
   days: DayType[];
   setPeriod: (day: DayType) => void;
   withInteraction: boolean;
-  onSelectedDay?: (days: DayType[]) => void;
+  hasCompletedRange?: (hasCompletedRange: boolean) => void;
 };
 
 type CheckMarkerType = {
@@ -58,20 +60,27 @@ export const CheckMarker = memo(
   }
 );
 
+const ajouterElement = (nouvelElement: any): void => {
+  if (daysT.length < 2) {
+    daysT.push(nouvelElement);
+  } else {
+    daysT.splice(0, 2, nouvelElement);
+  }
+};
+
 export const Days = memo(
   ({
     bookingDayHandler,
     days,
     setPeriod,
     withInteraction,
-    onSelectedDay,
+    hasCompletedRange,
   }: DayComponentType) => {
     const onPress = (day: DayType) => {
-      const days: DayType[] = [];
       if (day.day) {
-        if (onSelectedDay) {
-          if (days.length < 2) days.push(day);
-          if (days.length > 0) onSelectedDay(days);
+        if (hasCompletedRange) {
+          ajouterElement(day.day);
+          hasCompletedRange(daysT.length === 2);
         }
         if (day.isBooking && bookingDayHandler) bookingDayHandler(day);
 

@@ -18,7 +18,7 @@ export default function App() {
   return (
     <View>
       <CalendarComponent
-        editMode
+        withInteraction
         bookingDayHandler={(booking) => {
           console.log("booking", booking);
         }}
@@ -31,7 +31,9 @@ export default function App() {
         endDate={endDateCalendar}
         visualMonth={24}
         rangeDates={rangeDates}
-        onSelectedDay={(day) => console.log("day", day)}
+        hasCompletedRange={(hasCompletedRange) =>
+          console.log("hasCompletedRange", hasCompletedRange)
+        }
       />
       {showRange && (
         <View

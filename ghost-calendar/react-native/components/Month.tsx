@@ -12,14 +12,14 @@ export const Month = memo(
     bookingDayHandler,
     setPeriod,
     withInteraction,
-    onSelectedDay,
+    hasCompletedRange,
   }: {
     month: MonthType;
     editMode: boolean;
     bookingDayHandler?: (day: DayType) => void;
     setPeriod: (day: DayType) => void;
     withInteraction: boolean;
-    onSelectedDay?: (days: DayType[]) => void;
+    hasCompletedRange?: (hasCompletedRange: boolean) => void;
   }) => (
     <>
       <View style={{ marginBottom: 10, marginTop: 20, paddingLeft: 19 }}>
@@ -46,7 +46,7 @@ export const Month = memo(
           days={month.days}
           setPeriod={setPeriod}
           withInteraction={withInteraction}
-          onSelectedDay={onSelectedDay}
+          hasCompletedRange={hasCompletedRange}
         />
       )}
     </>
