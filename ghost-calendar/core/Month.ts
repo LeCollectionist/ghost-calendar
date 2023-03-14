@@ -1,6 +1,6 @@
 import Day from "./Day";
 
-import { date } from "./helpers/date";
+import { date, isDatePassed } from "./helpers/date";
 import {
   LocaleType,
   MonthType,
@@ -38,30 +38,39 @@ export default class Month {
         new Day(day)
           .getDate()
           .getDayNumber()
-          .isBooking(this.props.rangeDates)
+          .dayManagement(this.excludePastDate(this.props.rangeDates || []), {
+            bookingColors: this.props.bookingColors,
+          })
           .isCurrentDay(currentDate)
           .isPast(currentDate)
           .isStartDate(this.props.period?.startDate)
           .isEndDate(this.props.period?.endDate)
-          .setBookingType(this.props.rangeDates, this.props.bookingColors)
           .setRangeDate(
             this.props.period,
             this.props.checkIn,
             this.props.checkOut
           )
-          .setCheckInOutTimes(this.props.rangeDates)
-          .setPeriod(this.props.rangeDates)
           .isCheckInCheckOut(this.props.checkIn, this.props.checkOut)
           .isHalfDay()
-          .setBookingId(this.props.rangeDates)
-          .setBookingContractInfo(this.props.rangeDates)
-          .setOtherType(this.props.rangeDates)
-          .setBookingComment(this.props.rangeDates)
           .build()
       );
     } else {
       this.month.days.push({});
     }
+  }
+
+  private excludePastDate(rangeDates: Required<Period>[]) {
+    let range: Required<Period>[] = [];
+
+    rangeDates.forEach((value) => {
+      const date = new Date(value.endDate);
+
+      if (!isDatePassed(date)) {
+        range.push(value);
+      }
+    });
+
+    return range;
   }
 
   getMonthUniqueId() {

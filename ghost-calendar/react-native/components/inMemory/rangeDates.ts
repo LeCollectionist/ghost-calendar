@@ -2,8 +2,8 @@ import { Period } from "../../../core";
 
 export const rangeDates: Required<Period>[] = [
   {
-    startDate: "2022-05-01",
-    endDate: "2022-05-07",
+    startDate: "2023-03-20",
+    endDate: "2023-03-24",
     type: "other",
     checkInTime: 17,
     checkOutTime: 10,
@@ -11,8 +11,8 @@ export const rangeDates: Required<Period>[] = [
     otherType: "Bookings::Admin",
   },
   {
-    startDate: "2022-06-01",
-    endDate: "2022-06-07",
+    startDate: "2023-02-01",
+    endDate: "2023-03-07",
     type: "owner",
     checkInTime: 17,
     checkOutTime: 10,

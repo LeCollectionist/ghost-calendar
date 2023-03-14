@@ -113,172 +113,145 @@ export default class Day {
     return this;
   }
 
-  isBooking(range: Required<Period>[] | undefined) {
-    if (range) {
-      range.forEach((day) => {
-        if (day.startDate === this.day.day) {
-          this.day.isStartDate = true;
-          this.day.isBooking = true;
-        }
-
-        if (checkBetweenDates(day.startDate, day.endDate, this.day.day))
-          this.day.isBooking = true;
-
-        if (day.endDate === this.day.day) {
-          this.day.isEndDate = true;
-          this.day.isBooking = true;
-        }
-      });
-    }
-    return this;
-  }
-
-  setBookingType(
+  dayManagement(
     range: Required<Period>[] | undefined,
-    bookingColors?: BookingColorType
+    options: { bookingColors?: BookingColorType }
   ) {
     if (range) {
       range.forEach((day) => {
-        if (day.startDate === this.day.day) {
-          this.day.bookingType = day.type;
-
-          if (
-            bookingColors &&
-            bookingColors[day.type] &&
-            bookingColors[day.type].startEnd
-          )
-            this.day.bookingColor = bookingColors[day.type].startEnd;
-        }
-
-        if (checkBetweenDates(day.startDate, day.endDate, this.day.day)) {
-          this.day.bookingType = day.type;
-
-          if (
-            bookingColors &&
-            bookingColors[day.type] &&
-            bookingColors[day.type].beetween
-          )
-            this.day.bookingColor = bookingColors[day.type].beetween;
-        }
-
-        if (day.endDate === this.day.day) {
-          this.day.bookingType = day.type;
-
-          if (
-            bookingColors &&
-            bookingColors[day.type] &&
-            bookingColors[day.type].startEnd
-          )
-            this.day.bookingColor = bookingColors[day.type].startEnd;
-        }
+        this.isBooking(day);
+        this.setBookingType(day, options.bookingColors);
+        this.setCheckInOutTimes(day);
+        this.setPeriod(day);
+        this.setBookingId(day);
+        this.setOtherType(day);
+        this.setBookingContractInfo(day);
+        this.setBookingComment(day);
       });
     }
+
     return this;
   }
 
-  setCheckInOutTimes(range: Required<Period>[] | undefined) {
-    if (range) {
-      range.forEach((day) => {
-        if (day.startDate === this.day.day) {
-          this.day.checkInTime = day.checkInTime;
-          this.day.checkOutTime = day.checkOutTime;
-        }
-
-        if (checkBetweenDates(day.startDate, day.endDate, this.day.day)) {
-          this.day.checkInTime = day.checkInTime;
-          this.day.checkOutTime = day.checkOutTime;
-        }
-
-        if (day.endDate === this.day.day) {
-          this.day.checkInTime = day.checkInTime;
-          this.day.checkOutTime = day.checkOutTime;
-        }
-      });
+  private isBooking(day: Required<Period>) {
+    if (day.startDate === this.day.day) {
+      this.day.isStartDate = true;
+      this.day.isBooking = true;
     }
+
+    if (checkBetweenDates(day.startDate, day.endDate, this.day.day))
+      this.day.isBooking = true;
+
+    if (day.endDate === this.day.day) {
+      this.day.isEndDate = true;
+      this.day.isBooking = true;
+    }
+  }
+
+  private setBookingType(
+    day: Required<Period>,
+    bookingColors?: BookingColorType
+  ) {
+    if (day.startDate === this.day.day) {
+      this.day.bookingType = day.type;
+
+      if (
+        bookingColors &&
+        bookingColors[day.type] &&
+        bookingColors[day.type].startEnd
+      )
+        this.day.bookingColor = bookingColors[day.type].startEnd;
+    }
+
+    if (checkBetweenDates(day.startDate, day.endDate, this.day.day)) {
+      this.day.bookingType = day.type;
+
+      if (
+        bookingColors &&
+        bookingColors[day.type] &&
+        bookingColors[day.type].beetween
+      )
+        this.day.bookingColor = bookingColors[day.type].beetween;
+    }
+
+    if (day.endDate === this.day.day) {
+      this.day.bookingType = day.type;
+
+      if (
+        bookingColors &&
+        bookingColors[day.type] &&
+        bookingColors[day.type].startEnd
+      )
+        this.day.bookingColor = bookingColors[day.type].startEnd;
+    }
+  }
+
+  private setCheckInOutTimes(day: Required<Period>) {
+    const conditionOk =
+      day.startDate === this.day.day ||
+      checkBetweenDates(day.startDate, day.endDate, this.day.day) ||
+      day.endDate === this.day.day;
+
+    if (conditionOk) {
+      this.day.checkInTime = day.checkInTime;
+      this.day.checkOutTime = day.checkOutTime;
+    }
+  }
+
+  private setPeriod(day: Required<Period>) {
+    const conditionOk =
+      day.startDate === this.day.day ||
+      checkBetweenDates(day.startDate, day.endDate, this.day.day) ||
+      day.endDate === this.day.day;
+
+    if (conditionOk)
+      this.day.period = { checkIn: day.startDate, checkOut: day.endDate };
+  }
+
+  private setBookingId(day: Required<Period>) {
+    const conditionOk =
+      day.startDate === this.day.day ||
+      checkBetweenDates(day.startDate, day.endDate, this.day.day) ||
+      day.endDate === this.day.day;
+
+    if (conditionOk) this.day.id = day.id;
+  }
+
+  private setBookingContractInfo(day: BookingInfo) {
+    if (day.type === "contract") {
+      const { startDate, endDate } = day;
+      const conditionOk =
+        startDate === this.day.day ||
+        checkBetweenDates(startDate, endDate, this.day.day) ||
+        endDate === this.day.day;
+
+      if (conditionOk) this.setContractInfo(day);
+    }
+
     return this;
   }
 
-  setPeriod(range: Required<Period>[] | undefined) {
-    if (range) {
-      range.forEach((day) => {
-        if (day.startDate === this.day.day)
-          this.day.period = { checkIn: day.startDate, checkOut: day.endDate };
+  private setBookingComment(day: BookingInfo) {
+    if (day.type === "owner") {
+      const { startDate, privateNote, endDate } = day;
+      const conditionOk =
+        startDate === this.day.day ||
+        checkBetweenDates(startDate, endDate, this.day.day) ||
+        endDate === this.day.day;
 
-        if (checkBetweenDates(day.startDate, day.endDate, this.day.day))
-          this.day.period = { checkIn: day.startDate, checkOut: day.endDate };
-
-        if (day.endDate === this.day.day)
-          this.day.period = { checkIn: day.startDate, checkOut: day.endDate };
-      });
+      if (conditionOk) this.day.privateNote = privateNote;
     }
+
     return this;
   }
 
-  setBookingId(range: Required<Period>[] | undefined) {
-    if (range) {
-      range.forEach((day) => {
-        if (day.startDate === this.day.day) this.day.id = day.id;
+  private setOtherType(day: Required<Period>) {
+    const conditionOk =
+      day.startDate === this.day.day ||
+      checkBetweenDates(day.startDate, day.endDate, this.day.day) ||
+      day.endDate === this.day.day;
 
-        if (checkBetweenDates(day.startDate, day.endDate, this.day.day))
-          this.day.id = day.id;
-
-        if (day.endDate === this.day.day) this.day.id = day.id;
-      });
-    }
-    return this;
-  }
-
-  setBookingContractInfo(range: BookingInfo | undefined) {
-    if (range) {
-      range.forEach((day) => {
-        if (day.type === "contract") {
-          if (day.startDate === this.day.day) {
-            this.setContractInfo(day);
-          }
-
-          if (checkBetweenDates(day.startDate, day.endDate, this.day.day)) {
-            this.setContractInfo(day);
-          }
-
-          if (day.endDate === this.day.day) {
-            this.setContractInfo(day);
-          }
-        }
-      });
-    }
-    return this;
-  }
-
-  setBookingComment(range: BookingInfo | undefined) {
-    if (range) {
-      range.forEach((day) => {
-        if (day.type === "owner") {
-          if (day.startDate === this.day.day)
-            this.day.privateNote = day.privateNote;
-
-          if (checkBetweenDates(day.startDate, day.endDate, this.day.day))
-            this.day.privateNote = day.privateNote;
-
-          if (day.endDate === this.day.day)
-            this.day.privateNote = day.privateNote;
-        }
-      });
-    }
-    return this;
-  }
-
-  setOtherType(range: Required<Period>[] | undefined) {
-    if (range) {
-      range.forEach((day) => {
-        if (day.startDate === this.day.day) this.day.otherType = day.otherType;
-
-        if (checkBetweenDates(day.startDate, day.endDate, this.day.day))
-          this.day.otherType = day.otherType;
-
-        if (day.endDate === this.day.day) this.day.otherType = day.otherType;
-      });
-    }
-    return this;
+    if (conditionOk) this.day.otherType = day.otherType;
   }
 
   build() {

@@ -1,5 +1,3 @@
-import { getMonthDiff } from "./helpers/utils";
-
 import { dayFormatter } from "./helpers/date";
 import { DayType, BookingColorType, BookingInfo } from "./helpers/types";
 import { notifyIfPeriodIsUncompleted } from "./helpers/notifiers";
@@ -13,7 +11,7 @@ export default class Calendar {
       endDate: Date;
       checkIn?: Date;
       checkOut?: Date;
-      rangeDates: BookingInfo;
+      rangeDates: BookingInfo[];
       visualMonth: number;
       bookingColors: BookingColorType;
     }
@@ -82,11 +80,7 @@ export default class Calendar {
   }
 
   private setNbMonth(presenter: CalendarPresenter) {
-    const nbMonths: number = getMonthDiff(
-      this.props.startDate,
-      this.props.endDate
-    );
-    presenter.displayMonthRange(nbMonths);
+    presenter.displayMonthRange(this.props.visualMonth);
   }
 
   build(presenter: CalendarPresenter) {

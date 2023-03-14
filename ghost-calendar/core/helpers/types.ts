@@ -71,7 +71,7 @@ export type OwnerInfo = {
   privateNote?: string;
 };
 
-export type BookingInfo = Array<Required<Period> & ContractInfo & OwnerInfo>;
+export type BookingInfo = Required<Period> & ContractInfo & OwnerInfo;
 
 export type LocaleType = "fr" | "en" | undefined;
 

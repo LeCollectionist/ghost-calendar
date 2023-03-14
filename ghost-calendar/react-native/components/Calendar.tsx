@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { View, ActivityIndicator, FlatList } from "react-native";
 import { BookingColorType, DayType, LocaleType, Period } from "../../core";
 
@@ -51,10 +51,10 @@ const CalendarComponent = ({
   });
 
   useEffect(() => {
-    if (rangeMarkerHandler && calendar?.checkIn && calendar?.checkOut) {
+    if (rangeMarkerHandler) {
       rangeMarkerHandler({
-        startDate: calendar.checkIn,
-        endDate: calendar.checkOut,
+        startDate: calendar?.checkIn || "",
+        endDate: calendar?.checkOut || "",
         resetCalendar: () => resetCalendar(),
       });
     }

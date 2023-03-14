@@ -19,7 +19,7 @@ import {
 import { CurrentDayPointer } from "./CurrentDayPointer";
 import { CheckIn, CheckOut, CheckInCheckOut } from "./PeriodDelimiter";
 
-let daysT: DayType[] = [];
+let daysT: string[] = [];
 
 export type DayComponentType = {
   bookingDayHandler?: (day: DayType) => void;
@@ -60,7 +60,7 @@ export const CheckMarker = memo(
   }
 );
 
-const ajouterElement = (nouvelElement: any): void => {
+const ajouterElement = (nouvelElement: string): void => {
   if (daysT.length < 2) {
     daysT.push(nouvelElement);
   } else {
@@ -77,17 +77,15 @@ export const Days = memo(
     hasCompletedRange,
   }: DayComponentType) => {
     const onPress = (day: DayType) => {
-      if (day.day) {
-        if (hasCompletedRange) {
-          ajouterElement(day.day);
-          hasCompletedRange(daysT.length === 2);
-        }
-        if (day.isBooking && bookingDayHandler) bookingDayHandler(day);
+      if (hasCompletedRange && day.day) {
+        ajouterElement(day.day);
+        hasCompletedRange(daysT.length === 2);
+      }
+      if (day.isBooking && bookingDayHandler) bookingDayHandler(day);
 
-        if (withInteraction) {
-          setPeriod(day);
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-        }
+      if (withInteraction) {
+        setPeriod(day);
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
       }
     };
 
