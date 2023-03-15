@@ -134,22 +134,21 @@ export class CalendarPresenter extends Presenter<CalendarVM> {
   }
 
   displayEndDate(day: string, startDayState: string) {
-    this.vm.checkIn = startDayState;
-    this.vm.checkOut = day;
-
-    if (this.vm.checkIn === this.vm.checkOut) {
-      this.displayInitializePeriod();
-    } else if (getBookingDates(this, startDayState, day).length === 0) {
-      this.displayCalendar({
-        period: { startDate: startDayState, endDate: day },
-        bookingColors: this.vm.bookingColors,
-      });
+    if (getBookingDates(this, startDayState, day).length > 0) {
+      this.vm.checkIn = day;
+      this.vm.checkOut = "";
     } else {
-      this.displayCalendar({
-        period: { startDate: day, endDate: "" },
-        bookingColors: this.vm.bookingColors,
-      });
+      this.vm.checkIn = startDayState;
+      this.vm.checkOut = day;
+
+      if (this.vm.checkIn === this.vm.checkOut) {
+        this.displayInitializePeriod();
+      }
     }
+    this.displayCalendar({
+      period: { startDate: this.vm.checkIn, endDate: this.vm.checkOut },
+      bookingColors: this.vm.bookingColors,
+    });
     this.notifyVM();
   }
 
