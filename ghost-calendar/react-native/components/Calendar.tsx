@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { View, ActivityIndicator, FlatList } from "react-native";
 import { BookingColorType, DayType, LocaleType, Period } from "../../core";
 

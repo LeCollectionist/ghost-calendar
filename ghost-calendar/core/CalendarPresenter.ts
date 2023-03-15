@@ -145,7 +145,10 @@ export class CalendarPresenter extends Presenter<CalendarVM> {
         bookingColors: this.vm.bookingColors,
       });
     } else {
-      this.displayInitializePeriod();
+      this.displayCalendar({
+        period: { startDate: day, endDate: "" },
+        bookingColors: this.vm.bookingColors,
+      });
     }
     this.notifyVM();
   }
