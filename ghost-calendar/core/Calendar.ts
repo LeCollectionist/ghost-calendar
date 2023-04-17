@@ -1,8 +1,14 @@
 import { dayFormatter } from "./helpers/date";
-import { DayType, BookingColorType, BookingInfo } from "./helpers/types";
+import {
+  DayType,
+  BookingColorType,
+  BookingInfo,
+  WorldTimezones,
+} from "./helpers/types";
 import { notifyIfPeriodIsUncompleted } from "./helpers/notifiers";
 
 import { CalendarPresenter } from "./CalendarPresenter";
+import { getDateWithTimeZone } from "./helpers/utils";
 
 export default class Calendar {
   constructor(
@@ -14,6 +20,7 @@ export default class Calendar {
       rangeDates: BookingInfo[];
       visualMonth: number;
       bookingColors: BookingColorType;
+      timezone?: WorldTimezones;
     }
   ) {}
 
@@ -36,7 +43,12 @@ export default class Calendar {
       (day.isStartDate && startDayState)
     ) {
       if (periodIsUncompleted) {
-        notifyIfPeriodIsUncompleted(presenter, date, startDayState);
+        notifyIfPeriodIsUncompleted(
+          presenter,
+          date,
+          startDayState,
+          this.props.timezone
+        );
       } else if (periodIsCompleted) {
         presenter.displayStartDate(date);
       } else {
@@ -61,10 +73,16 @@ export default class Calendar {
 
   private setStartDateAndEndDate() {
     if (!this.props.startDate) {
-      this.props.startDate = new Date();
+      this.props.startDate = getDateWithTimeZone(
+        new Date(),
+        this.props.timezone
+      );
     }
     if (!this.props.endDate) {
-      this.props.endDate = new Date(new Date().getFullYear() + 2, 0, 1);
+      this.props.endDate = getDateWithTimeZone(
+        new Date(new Date().getFullYear() + 2, 0, 1),
+        this.props.timezone
+      );
     }
   }
 

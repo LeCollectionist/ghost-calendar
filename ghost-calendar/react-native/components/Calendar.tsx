@@ -1,6 +1,12 @@
 import { useEffect } from "react";
 import { View, ActivityIndicator, FlatList } from "react-native";
-import { BookingColorType, DayType, LocaleType, Period } from "../../core";
+import {
+  BookingColorType,
+  DayType,
+  LocaleType,
+  Period,
+  WorldTimezones,
+} from "../../core";
 
 import { useCalendar } from "../hooks/useCalendar";
 
@@ -22,6 +28,7 @@ type CalendarComponentType = {
   visualMonth: number;
   withInteraction?: boolean;
   hasCompletedRange?: (hasCompletedRange: boolean) => void;
+  timezone?: WorldTimezones;
 };
 
 const CalendarComponent = ({
@@ -38,6 +45,7 @@ const CalendarComponent = ({
   visualMonth,
   withInteraction = false,
   hasCompletedRange,
+  timezone,
 }: CalendarComponentType) => {
   const { calendar, setPeriod, resetCalendar } = useCalendar({
     bookingColors,
@@ -48,6 +56,7 @@ const CalendarComponent = ({
     rangeDates,
     startDate,
     visualMonth,
+    timezone,
   });
 
   useEffect(() => {

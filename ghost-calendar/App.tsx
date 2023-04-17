@@ -34,6 +34,7 @@ export default function App() {
         hasCompletedRange={(hasCompletedRange) =>
           console.log("hasCompletedRange", hasCompletedRange)
         }
+        timezone="Europe/Paris"
       />
       {showRange && (
         <View

@@ -42,7 +42,7 @@ xdate.locales["fr"] = {
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const date = (date: any) => new xdate(date);
+export const date = (date: any) => new xdate(date, true);
 
 export const dayFormatter = (day: Date, format: string) => {
   return date(day).toString(format);

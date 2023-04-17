@@ -1,6 +1,7 @@
 import { CalendarPresenter } from "../CalendarPresenter";
 
-import { DayType, MonthType, LocaleType } from "./types";
+import XDate from "xdate";
+import { DayType, MonthType, LocaleType, WorldTimezones } from "./types";
 import { date, dayFormatter } from "./date";
 
 export const getMonthName = (day: Date, locale?: LocaleType): string => {
@@ -10,15 +11,19 @@ export const getMonthName = (day: Date, locale?: LocaleType): string => {
   return `${currentMonth} ${currentYear}`;
 };
 
-export const getFirstDayOfMonth = (date: Date) => {
-  return new Date(date.getFullYear(), date.getMonth(), 1);
+export const getFirstDayOfMonth = (date: Date, timezone?: WorldTimezones) => {
+  return getDateWithTimeZone(
+    new Date(date.getFullYear(), date.getMonth(), 1),
+    timezone
+  ) as unknown as Date;
 };
 
 export const getFirstDayOfFirstWeekOfMonth = (
   day: Date,
-  firstDayOfWeek: number
+  firstDayOfWeek: number,
+  timezone?: WorldTimezones
 ) => {
-  const firstDay = getFirstDayOfMonth(day);
+  const firstDay = getFirstDayOfMonth(day, timezone);
   let offset = firstDayOfWeek - firstDay.getDay();
 
   if (offset > 0) {
@@ -28,11 +33,16 @@ export const getFirstDayOfFirstWeekOfMonth = (
   return date(firstDay.setDate(firstDay.getDate() + offset));
 };
 
-export const checkCurrentDayAndPastDay = (date: string, currentDay: Date) => {
+export const checkCurrentDayAndPastDay = (
+  date: string,
+  currentDay: Date,
+  timezone?: WorldTimezones
+) => {
   return (
-    getDateWithoutTimeZone(new Date(date)).getTime() <
-    getDateWithoutTimeZone(
-      new Date(dayFormatter(currentDay, "yyyy-MM-dd"))
+    getDateWithTimeZone(new Date(date), timezone).getTime() <
+    getDateWithTimeZone(
+      new Date(dayFormatter(currentDay, "yyyy-MM-dd")),
+      timezone
     ).getTime()
   );
 };
@@ -43,11 +53,9 @@ export const checkBetweenDates = (
   currentDate: string | undefined
 ) => {
   if (currentDate) {
-    const startDateTime = getDateWithoutTimeZone(new Date(startDate)).getTime();
-    const endDateTime = getDateWithoutTimeZone(new Date(endDate)).getTime();
-    const currentDateTime = getDateWithoutTimeZone(
-      new Date(currentDate)
-    ).getTime();
+    const startDateTime = date(new Date(startDate)).getTime();
+    const endDateTime = date(new Date(endDate)).getTime();
+    const currentDateTime = date(new Date(currentDate)).getTime();
 
     if (currentDateTime > startDateTime && currentDateTime < endDateTime) {
       return true;
@@ -95,14 +103,18 @@ const pushBookingDates = (
   }
 };
 
-export const getMonthDiff = (d1: Date, d2: Date): number => {
+export const getMonthDiff = (
+  d1: Date,
+  d2: Date,
+  timezone?: WorldTimezones
+): number => {
   let months;
   months =
-    (getDateWithoutTimeZone(d2).getFullYear() -
-      getDateWithoutTimeZone(d1).getFullYear()) *
+    (getDateWithTimeZone(d2, timezone).getFullYear() -
+      getDateWithTimeZone(d1, timezone).getFullYear()) *
     12;
-  months -= getDateWithoutTimeZone(d1).getMonth();
-  months += getDateWithoutTimeZone(d2).getMonth();
+  months -= getDateWithTimeZone(d1, timezone).getMonth();
+  months += getDateWithTimeZone(d2, timezone).getMonth();
 
   return months <= 0 ? 0 : months;
 };
@@ -111,10 +123,17 @@ export const getMonthDiff = (d1: Date, d2: Date): number => {
 export const getBookingDates = (
   presenter: CalendarPresenter,
   startDayState: string,
-  endDayState: string
+  endDayState: string,
+  timezone?: WorldTimezones
 ) => {
-  const endDate = getDateWithoutTimeZone(new Date(endDayState));
-  const startDate = getDateWithoutTimeZone(new Date(startDayState));
+  const endDate = getDateWithTimeZone(
+    new Date(endDayState),
+    timezone
+  ) as unknown as Date;
+  const startDate = getDateWithTimeZone(
+    new Date(startDayState),
+    timezone
+  ) as unknown as Date;
   const bookingDate: DayType[] = [];
 
   const startDateMonth = startDate.getMonth();
@@ -143,10 +162,16 @@ export const getBookingDates = (
   return bookingDate;
 };
 
-export const getDateWithoutTimeZone = (date: Date) => {
-  const newDate = `${date.getFullYear()}-${
-    date.getMonth() + 1
-  }-${date.getDate()}`;
+export const getDateWithTimeZone = (
+  date: Date,
+  timeZone: WorldTimezones = "Europe/Paris"
+) => {
+  const timeZoneDay = date.toLocaleString("en", { timeZone }).split(/[-, :]/);
+  const timeZonedate = timeZoneDay[0].split("/");
+  const newTimeZonedate = `${timeZonedate[2]}-${timeZonedate[0]}-${timeZonedate[1]}`;
 
-  return new Date(newDate);
+  return new XDate(newTimeZonedate, true)
+    .setHours(Number(timeZoneDay[2]))
+    .setMinutes(Number(timeZoneDay[3]))
+    .setSeconds(Number(timeZoneDay[4])) as unknown as Date;
 };

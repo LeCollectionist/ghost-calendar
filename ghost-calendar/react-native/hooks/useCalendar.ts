@@ -8,6 +8,7 @@ import {
   DayType,
   LocaleType,
   Period,
+  WorldTimezones,
 } from "../../core";
 
 type CalendarProps = {
@@ -19,6 +20,7 @@ type CalendarProps = {
   rangeDates: Required<Period>[];
   visualMonth: number;
   bookingColors: BookingColorType;
+  timezone?: WorldTimezones;
 };
 
 export const useCalendar = ({
@@ -30,10 +32,11 @@ export const useCalendar = ({
   rangeDates,
   visualMonth,
   bookingColors,
+  timezone,
 }: CalendarProps) => {
   const [calendarState, setCalendarState] = useState<CalendarVM | null>(null);
 
-  const presenter = new CalendarPresenter(locale, startDate);
+  const presenter = new CalendarPresenter(locale, startDate, timezone);
   const calendar = new Calendar({
     startDate,
     endDate,
@@ -42,6 +45,7 @@ export const useCalendar = ({
     rangeDates,
     visualMonth,
     bookingColors,
+    timezone,
   });
 
   calendar.build(presenter);

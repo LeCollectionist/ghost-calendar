@@ -6,12 +6,13 @@ import {
   MonthType,
   Period,
   BookingColorType,
+  WorldTimezones,
 } from "./helpers/types";
 import {
   getMonthName,
   getFirstDayOfMonth,
   getFirstDayOfFirstWeekOfMonth,
-  getDateWithoutTimeZone,
+  getDateWithTimeZone,
 } from "./helpers/utils";
 
 const FIRST_DAY_OF_WEEK = 1;
@@ -28,6 +29,7 @@ export default class Month {
       checkIn?: Date;
       checkOut?: Date;
       bookingColors?: BookingColorType;
+      timezone?: WorldTimezones;
     }
   ) {}
 
@@ -64,7 +66,10 @@ export default class Month {
     let range: Required<Period>[] = [];
 
     rangeDates.forEach((value) => {
-      const date = new Date(value.endDate);
+      const date = getDateWithTimeZone(
+        new Date(value.endDate),
+        this.props.timezone
+      );
 
       if (!isDatePassed(date)) {
         range.push(value);
@@ -89,7 +94,7 @@ export default class Month {
 
   getMonthName(locale: LocaleType) {
     this.month.monthName = getMonthName(
-      getFirstDayOfMonth(this.props.date),
+      getFirstDayOfMonth(this.props.date, this.props.timezone),
       locale
     );
 
@@ -105,15 +110,15 @@ export default class Month {
   getMonth() {
     const firstDay = getFirstDayOfFirstWeekOfMonth(
       this.props.date,
-      FIRST_DAY_OF_WEEK
+      FIRST_DAY_OF_WEEK,
+      this.props.timezone
     );
-    const currentDate = getDateWithoutTimeZone(new Date());
+    const currentDate = getDateWithTimeZone(new Date(), this.props.timezone);
 
     for (let i = 0; i < MAX_DAYS_IN_MONTH; i++) {
       const day = date(firstDay).addDays(i) as unknown as Date;
-      const newDay = getDateWithoutTimeZone(day);
 
-      this.pushDayInMonth(newDay, currentDate);
+      this.pushDayInMonth(day, currentDate);
     }
 
     return this;

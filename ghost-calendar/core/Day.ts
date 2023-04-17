@@ -6,13 +6,14 @@ import {
   BookingInfo,
   ContractInfo,
   OwnerInfo,
+  WorldTimezones,
 } from "./helpers/types";
 import { checkCurrentDayAndPastDay, checkBetweenDates } from "./helpers/utils";
 
 export default class Day {
   private day: DayType = {};
 
-  constructor(private currentDay: Date) {}
+  constructor(private currentDay: Date, private timezone?: WorldTimezones) {}
 
   private setContractInfo(day: Required<Period> & ContractInfo & OwnerInfo) {
     this.day.clientFirstname = day.clientFirstname;
@@ -49,7 +50,10 @@ export default class Day {
   }
 
   isPast(date: Date) {
-    if (this.day.day && checkCurrentDayAndPastDay(this.day.day, date)) {
+    if (
+      this.day.day &&
+      checkCurrentDayAndPastDay(this.day.day, date, this.timezone)
+    ) {
       this.day.isPastDay = true;
     }
 
