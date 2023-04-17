@@ -1,11 +1,7 @@
 import Month from "./Month";
 import Presenter from "./Presenter";
 
-import {
-  getBookingDates,
-  getDateWithTimeZone,
-  getMonthDiff,
-} from "./helpers/utils";
+import { getBookingDates, getMonthDiff } from "./helpers/utils";
 import {
   LocaleType,
   MonthType,
@@ -34,21 +30,14 @@ export class CalendarPresenter extends Presenter<CalendarVM> {
     private timezone?: WorldTimezones
   ) {
     super(new CalendarVM());
-    this.nextMonth =
-      this.startMonth || getDateWithTimeZone(new Date(), this.timezone);
+    this.nextMonth = this.startMonth || new Date();
   }
 
   private getNextMonth(date: Date, countMonth: number) {
     if (countMonth === 0) {
-      this.nextMonth = getDateWithTimeZone(
-        new Date(date.getFullYear(), date.getMonth(), 1),
-        this.timezone
-      ) as unknown as Date;
+      this.nextMonth = new Date(date.getFullYear(), date.getMonth(), 1);
     } else {
-      this.nextMonth = getDateWithTimeZone(
-        new Date(date.getFullYear(), date.getMonth() + 1, 1),
-        this.timezone
-      ) as unknown as Date;
+      this.nextMonth = new Date(date.getFullYear(), date.getMonth() + 1, 1);
     }
 
     return this.nextMonth;
@@ -93,10 +82,7 @@ export class CalendarPresenter extends Presenter<CalendarVM> {
 
   setActiveIndex(checkIn: Date, checkOut: Date) {
     if (checkIn && checkOut) {
-      const startDate = getDateWithTimeZone(
-        new Date(),
-        this.timezone
-      ) as unknown as Date;
+      const startDate = new Date();
       const startIndex = getMonthDiff(startDate, checkIn, this.timezone);
 
       this.vm.activeIndex = startIndex;

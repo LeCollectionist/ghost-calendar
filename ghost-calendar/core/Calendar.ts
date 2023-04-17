@@ -8,7 +8,6 @@ import {
 import { notifyIfPeriodIsUncompleted } from "./helpers/notifiers";
 
 import { CalendarPresenter } from "./CalendarPresenter";
-import { getDateWithTimeZone } from "./helpers/utils";
 
 export default class Calendar {
   constructor(
@@ -73,16 +72,10 @@ export default class Calendar {
 
   private setStartDateAndEndDate() {
     if (!this.props.startDate) {
-      this.props.startDate = getDateWithTimeZone(
-        new Date(),
-        this.props.timezone
-      );
+      this.props.startDate = new Date();
     }
     if (!this.props.endDate) {
-      this.props.endDate = getDateWithTimeZone(
-        new Date(new Date().getFullYear() + 2, 0, 1),
-        this.props.timezone
-      );
+      this.props.endDate = new Date(new Date().getFullYear() + 2, 0, 1);
     }
   }
 

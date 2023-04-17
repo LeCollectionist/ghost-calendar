@@ -29,7 +29,7 @@ export default function App() {
         locale="fr"
         startDate={startDateCalendar}
         endDate={endDateCalendar}
-        visualMonth={3}
+        visualMonth={1}
         rangeDates={rangeDates}
         hasCompletedRange={(hasCompletedRange) =>
           console.log("hasCompletedRange", hasCompletedRange)

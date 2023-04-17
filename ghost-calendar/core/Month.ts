@@ -1,6 +1,6 @@
 import Day from "./Day";
 
-import { date, isDatePassed } from "./helpers/date";
+import { dateHandler, isDatePassed } from "./helpers/date";
 import {
   LocaleType,
   MonthType,
@@ -12,7 +12,7 @@ import {
   getMonthName,
   getFirstDayOfMonth,
   getFirstDayOfFirstWeekOfMonth,
-  getDateWithTimeZone,
+  DateType,
 } from "./helpers/utils";
 
 const FIRST_DAY_OF_WEEK = 1;
@@ -33,8 +33,8 @@ export default class Month {
     }
   ) {}
 
-  private pushDayInMonth(day: Date, currentDate: Date) {
-    const belongsToThisMonth = day.getMonth() === this.month?.monthKey;
+  private pushDayInMonth(day: DateType, currentDate: DateType) {
+    const belongsToThisMonth = day.get("month") === this.month?.monthKey;
 
     if (belongsToThisMonth) {
       this.month.days.push(
@@ -66,12 +66,12 @@ export default class Month {
     let range: Required<Period>[] = [];
 
     rangeDates.forEach((value) => {
-      const date = getDateWithTimeZone(
-        new Date(value.endDate),
-        this.props.timezone
-      );
+      const date = dateHandler({
+        date: value.endDate,
+        timezone: this.props.timezone,
+      });
 
-      if (!isDatePassed(date)) {
+      if (!isDatePassed(date, this.props.timezone)) {
         range.push(value);
       }
     });
@@ -94,7 +94,10 @@ export default class Month {
 
   getMonthName(locale: LocaleType) {
     this.month.monthName = getMonthName(
-      getFirstDayOfMonth(this.props.date, this.props.timezone),
+      getFirstDayOfMonth(
+        dateHandler({ date: this.props.date, timezone: this.props.timezone }),
+        this.props.timezone
+      ),
       locale
     );
 
@@ -109,15 +112,17 @@ export default class Month {
 
   getMonth() {
     const firstDay = getFirstDayOfFirstWeekOfMonth(
-      this.props.date,
+      dateHandler({ date: this.props.date, timezone: this.props.timezone }),
       FIRST_DAY_OF_WEEK,
       this.props.timezone
     );
-    const currentDate = getDateWithTimeZone(new Date(), this.props.timezone);
+    const currentDate = dateHandler({ timezone: this.props.timezone });
 
     for (let i = 0; i < MAX_DAYS_IN_MONTH; i++) {
-      const day = date(firstDay).addDays(i) as unknown as Date;
-
+      const day = dateHandler({
+        date: firstDay,
+        timezone: this.props.timezone,
+      }).add(i, "day");
       this.pushDayInMonth(day, currentDate);
     }
 

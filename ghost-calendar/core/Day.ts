@@ -6,14 +6,17 @@ import {
   BookingInfo,
   ContractInfo,
   OwnerInfo,
-  WorldTimezones,
 } from "./helpers/types";
-import { checkCurrentDayAndPastDay, checkBetweenDates } from "./helpers/utils";
+import {
+  checkCurrentDayAndPastDay,
+  checkBetweenDates,
+  DateType,
+} from "./helpers/utils";
 
 export default class Day {
   private day: DayType = {};
 
-  constructor(private currentDay: Date, private timezone?: WorldTimezones) {}
+  constructor(private currentDay: DateType) {}
 
   private setContractInfo(day: Required<Period> & ContractInfo & OwnerInfo) {
     this.day.clientFirstname = day.clientFirstname;
@@ -27,21 +30,21 @@ export default class Day {
   }
 
   getDate() {
-    this.day.day = dayFormatter(this.currentDay, "yyyy-MM-dd");
+    this.day.day = dayFormatter(this.currentDay, "YYYY-MM-DD");
 
     return this;
   }
 
   getDayNumber() {
-    this.day.dayNumber = dayFormatter(this.currentDay, "d");
+    this.day.dayNumber = dayFormatter(this.currentDay, "D");
 
     return this;
   }
 
-  isCurrentDay(date: Date) {
+  isCurrentDay(date: DateType) {
     if (
-      dayFormatter(this.currentDay, "yyyy-MM-dd") ===
-      dayFormatter(date, "yyyy-MM-dd")
+      dayFormatter(this.currentDay, "YYYY-MM-DD") ===
+      dayFormatter(date, "YYYY-MM-DD")
     ) {
       this.day.isCurrentDay = true;
     }
@@ -49,11 +52,8 @@ export default class Day {
     return this;
   }
 
-  isPast(date: Date) {
-    if (
-      this.day.day &&
-      checkCurrentDayAndPastDay(this.day.day, date, this.timezone)
-    ) {
+  isPast(date: DateType) {
+    if (this.day.day && checkCurrentDayAndPastDay(this.day.day, date)) {
       this.day.isPastDay = true;
     }
 
@@ -61,11 +61,11 @@ export default class Day {
   }
 
   isCheckInCheckOut(checkIn?: Date, checkOut?: Date) {
-    if (checkIn && dayFormatter(checkIn, "yyyy-MM-dd") === this.day.day) {
+    if (checkIn && dayFormatter(checkIn, "YYYY-MM-DD") === this.day.day) {
       this.day.isStartDate = true;
     } else if (
       checkOut &&
-      dayFormatter(checkOut, "yyyy-MM-dd") === this.day.day
+      dayFormatter(checkOut, "YYYY-MM-DD") === this.day.day
     ) {
       this.day.isEndDate = true;
     }
@@ -102,8 +102,8 @@ export default class Day {
       checkIn &&
       checkOut &&
       checkBetweenDates(
-        dayFormatter(checkIn, "yyyy-MM-dd"),
-        dayFormatter(checkOut, "yyyy-MM-dd"),
+        dayFormatter(checkIn, "YYYY-MM-DD"),
+        dayFormatter(checkOut, "YYYY-MM-DD"),
         this.day.day
       )
     )

@@ -1,49 +1,55 @@
 import { CalendarPresenter } from "../CalendarPresenter";
+import dayjs from "dayjs";
 
-import XDate from "xdate";
 import { DayType, MonthType, LocaleType, WorldTimezones } from "./types";
-import { date, dayFormatter } from "./date";
+import { dateHandler, dayFormatter } from "./date";
 
-export const getMonthName = (day: Date, locale?: LocaleType): string => {
-  const currentMonth = date(day).toString("MMMM", locale);
-  const currentYear = date(day).toString("yyyy");
+export type DateType = dayjs.Dayjs;
+
+export const getMonthName = (day: DateType, locale?: LocaleType): string => {
+  const currentMonth = dateHandler({ date: day })
+    .locale(locale || "en")
+    .format("MMMM");
+  const currentYear = dateHandler({ date: day }).format("YYYY");
 
   return `${currentMonth} ${currentYear}`;
 };
 
-export const getFirstDayOfMonth = (date: Date, timezone?: WorldTimezones) => {
-  return getDateWithTimeZone(
-    new Date(date.getFullYear(), date.getMonth(), 1),
-    timezone
-  ) as unknown as Date;
+export const getFirstDayOfMonth = (
+  date: DateType,
+  timezone?: WorldTimezones
+) => {
+  return dateHandler({
+    date: new Date(date.get("year"), date.get("month"), 1),
+    timezone,
+  });
 };
 
 export const getFirstDayOfFirstWeekOfMonth = (
-  day: Date,
+  day: DateType,
   firstDayOfWeek: number,
   timezone?: WorldTimezones
 ) => {
   const firstDay = getFirstDayOfMonth(day, timezone);
-  let offset = firstDayOfWeek - firstDay.getDay();
+  let offset = firstDayOfWeek - firstDay.get("day");
 
   if (offset > 0) {
     offset -= 7;
   }
 
-  return date(firstDay.setDate(firstDay.getDate() + offset));
+  return dateHandler({
+    date: firstDay.set("date", firstDay.get("date") + offset),
+    timezone,
+  });
 };
 
 export const checkCurrentDayAndPastDay = (
   date: string,
-  currentDay: Date,
-  timezone?: WorldTimezones
+  currentDay: DateType
 ) => {
   return (
-    getDateWithTimeZone(new Date(date), timezone).getTime() <
-    getDateWithTimeZone(
-      new Date(dayFormatter(currentDay, "yyyy-MM-dd")),
-      timezone
-    ).getTime()
+    new Date(date).getTime() <
+    new Date(dayFormatter(currentDay, "YYYY-MM-DD")).getTime()
   );
 };
 
@@ -53,9 +59,9 @@ export const checkBetweenDates = (
   currentDate: string | undefined
 ) => {
   if (currentDate) {
-    const startDateTime = date(new Date(startDate)).getTime();
-    const endDateTime = date(new Date(endDate)).getTime();
-    const currentDateTime = date(new Date(currentDate)).getTime();
+    const startDateTime = new Date(startDate).getTime();
+    const endDateTime = new Date(endDate).getTime();
+    const currentDateTime = new Date(currentDate).getTime();
 
     if (currentDateTime > startDateTime && currentDateTime < endDateTime) {
       return true;
@@ -79,8 +85,8 @@ const findMonth = (
 
 const pushBookingDates = (
   monthFound: MonthType | undefined,
-  startDate: Date,
-  endDate: Date,
+  startDate: DateType,
+  endDate: DateType,
   bookingDate: DayType[]
 ) => {
   if (monthFound) {
@@ -110,11 +116,11 @@ export const getMonthDiff = (
 ): number => {
   let months;
   months =
-    (getDateWithTimeZone(d2, timezone).getFullYear() -
-      getDateWithTimeZone(d1, timezone).getFullYear()) *
+    (dateHandler({ date: d2, timezone }).get("year") -
+      dateHandler({ date: d1, timezone }).get("year")) *
     12;
-  months -= getDateWithTimeZone(d1, timezone).getMonth();
-  months += getDateWithTimeZone(d2, timezone).getMonth();
+  months -= dateHandler({ date: d1, timezone }).get("month");
+  months += dateHandler({ date: d2, timezone }).get("month");
 
   return months <= 0 ? 0 : months;
 };
@@ -126,20 +132,14 @@ export const getBookingDates = (
   endDayState: string,
   timezone?: WorldTimezones
 ) => {
-  const endDate = getDateWithTimeZone(
-    new Date(endDayState),
-    timezone
-  ) as unknown as Date;
-  const startDate = getDateWithTimeZone(
-    new Date(startDayState),
-    timezone
-  ) as unknown as Date;
+  const endDate = dateHandler({ date: endDayState, timezone });
+  const startDate = dateHandler({ date: startDayState, timezone });
   const bookingDate: DayType[] = [];
 
-  const startDateMonth = startDate.getMonth();
-  const startDateYear = startDate.getFullYear();
-  const endDateMonth = endDate.getMonth();
-  const endDateYear = endDate.getFullYear();
+  const startDateMonth = startDate.get("month");
+  const startDateYear = startDate.get("year");
+  const endDateMonth = endDate.get("month");
+  const endDateYear = endDate.get("year");
 
   if (endDateMonth === startDateMonth) {
     const monthFound = findMonth(presenter, endDateMonth, endDateYear);
@@ -160,18 +160,4 @@ export const getBookingDates = (
   }
 
   return bookingDate;
-};
-
-export const getDateWithTimeZone = (
-  date: Date,
-  timeZone: WorldTimezones = "Europe/Paris"
-) => {
-  const timeZoneDay = date.toLocaleString("en", { timeZone }).split(/[-, :]/);
-  const timeZonedate = timeZoneDay[0].split("/");
-  const newTimeZonedate = `${timeZonedate[2]}-${timeZonedate[0]}-${timeZonedate[1]}`;
-
-  return new XDate(newTimeZonedate, true)
-    .setHours(Number(timeZoneDay[2]))
-    .setMinutes(Number(timeZoneDay[3]))
-    .setSeconds(Number(timeZoneDay[4])) as unknown as Date;
 };

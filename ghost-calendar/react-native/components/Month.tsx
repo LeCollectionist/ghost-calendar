@@ -29,6 +29,7 @@ export const Month = memo(
             fontSize: 16,
             lineHeight: 24,
             color: "#202020",
+            textTransform: "capitalize",
           }}
         >
           {month.monthName}
