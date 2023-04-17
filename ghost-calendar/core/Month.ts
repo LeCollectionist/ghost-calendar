@@ -11,6 +11,7 @@ import {
   getMonthName,
   getFirstDayOfMonth,
   getFirstDayOfFirstWeekOfMonth,
+  getDateWithoutTimeZone,
 } from "./helpers/utils";
 
 const FIRST_DAY_OF_WEEK = 1;
@@ -106,12 +107,13 @@ export default class Month {
       this.props.date,
       FIRST_DAY_OF_WEEK
     );
-    const currentDate = new Date();
+    const currentDate = getDateWithoutTimeZone(new Date());
 
     for (let i = 0; i < MAX_DAYS_IN_MONTH; i++) {
       const day = date(firstDay).addDays(i) as unknown as Date;
+      const newDay = getDateWithoutTimeZone(day);
 
-      this.pushDayInMonth(day, currentDate);
+      this.pushDayInMonth(newDay, currentDate);
     }
 
     return this;

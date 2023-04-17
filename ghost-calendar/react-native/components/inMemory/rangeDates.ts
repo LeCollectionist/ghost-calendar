@@ -2,8 +2,8 @@ import { Period } from "../../../core";
 
 export const rangeDates: Required<Period>[] = [
   {
-    startDate: "2023-03-20",
-    endDate: "2023-03-24",
+    startDate: "2023-04-20",
+    endDate: "2023-04-24",
     type: "other",
     checkInTime: 17,
     checkOutTime: 10,
@@ -11,8 +11,8 @@ export const rangeDates: Required<Period>[] = [
     otherType: "Bookings::Admin",
   },
   {
-    startDate: "2023-02-01",
-    endDate: "2023-03-07",
+    startDate: "2023-05-01",
+    endDate: "2023-05-07",
     type: "owner",
     checkInTime: 17,
     checkOutTime: 10,
@@ -20,8 +20,8 @@ export const rangeDates: Required<Period>[] = [
     otherType: "Bookings::Owner",
   },
   {
-    startDate: "2022-07-15",
-    endDate: "2022-08-15",
+    startDate: "2023-05-15",
+    endDate: "2023-05-17",
     type: "other",
     checkInTime: 17,
     checkOutTime: 10,
@@ -29,8 +29,8 @@ export const rangeDates: Required<Period>[] = [
     otherType: "Bookings::Admin",
   },
   {
-    startDate: "2022-09-15",
-    endDate: "2022-09-18",
+    startDate: "2023-06-15",
+    endDate: "2023-06-18",
     type: "other",
     checkInTime: 17,
     checkOutTime: 10,

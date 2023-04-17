@@ -30,8 +30,10 @@ export const getFirstDayOfFirstWeekOfMonth = (
 
 export const checkCurrentDayAndPastDay = (date: string, currentDay: Date) => {
   return (
-    new Date(date).getTime() <
-    new Date(dayFormatter(currentDay, "yyyy-MM-dd")).getTime()
+    getDateWithoutTimeZone(new Date(date)).getTime() <
+    getDateWithoutTimeZone(
+      new Date(dayFormatter(currentDay, "yyyy-MM-dd"))
+    ).getTime()
   );
 };
 
@@ -41,9 +43,11 @@ export const checkBetweenDates = (
   currentDate: string | undefined
 ) => {
   if (currentDate) {
-    const startDateTime = new Date(startDate).getTime();
-    const endDateTime = new Date(endDate).getTime();
-    const currentDateTime = new Date(currentDate).getTime();
+    const startDateTime = getDateWithoutTimeZone(new Date(startDate)).getTime();
+    const endDateTime = getDateWithoutTimeZone(new Date(endDate)).getTime();
+    const currentDateTime = getDateWithoutTimeZone(
+      new Date(currentDate)
+    ).getTime();
 
     if (currentDateTime > startDateTime && currentDateTime < endDateTime) {
       return true;
@@ -93,9 +97,12 @@ const pushBookingDates = (
 
 export const getMonthDiff = (d1: Date, d2: Date): number => {
   let months;
-  months = (d2.getFullYear() - d1.getFullYear()) * 12;
-  months -= d1.getMonth();
-  months += d2.getMonth();
+  months =
+    (getDateWithoutTimeZone(d2).getFullYear() -
+      getDateWithoutTimeZone(d1).getFullYear()) *
+    12;
+  months -= getDateWithoutTimeZone(d1).getMonth();
+  months += getDateWithoutTimeZone(d2).getMonth();
 
   return months <= 0 ? 0 : months;
 };
@@ -106,8 +113,8 @@ export const getBookingDates = (
   startDayState: string,
   endDayState: string
 ) => {
-  const endDate = new Date(endDayState);
-  const startDate = new Date(startDayState);
+  const endDate = getDateWithoutTimeZone(new Date(endDayState));
+  const startDate = getDateWithoutTimeZone(new Date(startDayState));
   const bookingDate: DayType[] = [];
 
   const startDateMonth = startDate.getMonth();
@@ -134,4 +141,12 @@ export const getBookingDates = (
   }
 
   return bookingDate;
+};
+
+export const getDateWithoutTimeZone = (date: Date) => {
+  const newDate = `${date.getFullYear()}-${
+    date.getMonth() + 1
+  }-${date.getDate()}`;
+
+  return new Date(newDate);
 };
