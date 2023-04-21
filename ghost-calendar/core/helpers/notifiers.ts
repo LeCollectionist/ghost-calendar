@@ -1,4 +1,5 @@
 import { CalendarPresenter } from "../CalendarPresenter";
+import { dateHandler } from "./date";
 import { WorldTimezones } from "./types";
 import { checkCurrentDayAndPastDay } from "./utils";
 
@@ -8,7 +9,12 @@ export const notifyIfPeriodIsUncompleted = (
   startDayState: string,
   timezone?: WorldTimezones
 ) => {
-  if (checkCurrentDayAndPastDay(day, new Date(startDayState), timezone)) {
+  if (
+    checkCurrentDayAndPastDay(
+      day,
+      dateHandler({ date: startDayState, timezone })
+    )
+  ) {
     presenter.displayStartDate(day);
   } else {
     presenter.displayEndDate(day, startDayState);
