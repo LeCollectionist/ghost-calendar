@@ -1,6 +1,5 @@
-import Day from "./Day";
-
-import { dateHandler, isDatePassed } from "./helpers/date";
+import { createDay } from "./helpers/createDay";
+import { dateHandler } from "./helpers/date";
 import {
   LocaleType,
   MonthType,
@@ -33,54 +32,24 @@ export default class Month {
     }
   ) {}
 
-  private pushDayInMonth(day: DateType, currentDate: DateType) {
+  private pushDayInMonth(day: DateType) {
     const belongsToThisMonth = day.get("month") === this.month?.monthKey;
 
     if (belongsToThisMonth) {
-      this.month.days.push(
-        new Day(day)
-          .getDate()
-          .getDayNumber()
-          .dayManagement(this.excludePastDate(this.props.rangeDates || []), {
-            bookingColors: this.props.bookingColors,
-          })
-          .isCurrentDay(currentDate)
-          .isPast(currentDate)
-          .isStartDate(this.props.period?.startDate)
-          .isEndDate(this.props.period?.endDate)
-          .setRangeDate(
-            this.props.period,
-            this.props.checkIn,
-            this.props.checkOut
-          )
-          .isCheckInCheckOut(this.props.checkIn, this.props.checkOut)
-          .isHalfDay()
-          .build()
-      );
+      this.month.days.push(createDay({ day, ...this.props }));
     } else {
       this.month.days.push({});
     }
   }
 
-  private excludePastDate(rangeDates: Required<Period>[]) {
-    let range: Required<Period>[] = [];
-
-    rangeDates.forEach((value) => {
-      const date = dateHandler({
-        date: value.endDate,
-        timezone: this.props.timezone,
-      });
-
-      if (!isDatePassed(date, this.props.timezone)) {
-        range.push(value);
-      }
-    });
-
-    return range;
-  }
-
   getMonthUniqueId() {
     this.month.id = `${this.month.monthKey}-${this.month.yearKey}`;
+
+    return this;
+  }
+
+  getMonthIndex(index: number) {
+    this.month.index = index;
 
     return this;
   }
@@ -116,14 +85,14 @@ export default class Month {
       FIRST_DAY_OF_WEEK,
       this.props.timezone
     );
-    const currentDate = dateHandler({ timezone: this.props.timezone });
 
     for (let i = 0; i < MAX_DAYS_IN_MONTH; i++) {
-      const day = dateHandler({
-        date: firstDay,
-        timezone: this.props.timezone,
-      }).add(i, "day");
-      this.pushDayInMonth(day, currentDate);
+      this.pushDayInMonth(
+        dateHandler({
+          date: firstDay,
+          timezone: this.props.timezone,
+        }).add(i, "day")
+      );
     }
 
     return this;

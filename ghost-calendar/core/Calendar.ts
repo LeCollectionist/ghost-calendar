@@ -1,13 +1,13 @@
-import { dayFormatter } from "./helpers/date";
 import {
   DayType,
   BookingColorType,
   BookingInfo,
   WorldTimezones,
+  MonthType,
 } from "./helpers/types";
 import { notifyIfPeriodIsUncompleted } from "./helpers/notifiers";
 
-import { CalendarPresenter } from "./CalendarPresenter";
+import { CalendarPresenter, CalendarVM } from "./CalendarPresenter";
 
 export default class Calendar {
   constructor(
@@ -26,12 +26,13 @@ export default class Calendar {
   setPeriod(
     presenter: CalendarPresenter,
     day: DayType,
-    startDayState: string,
-    endDayState: string
+    calendarState: CalendarVM,
+    initialMonths: MonthType[]
   ) {
     const canBeStartDate = !day.isStartDate && !day.isBooking && !day.isPastDay;
-    const periodIsUncompleted = startDayState && !endDayState;
-    const periodIsCompleted = startDayState && endDayState;
+    const periodIsUncompleted =
+      calendarState.checkIn && !calendarState.checkOut;
+    const periodIsCompleted = calendarState.checkIn && calendarState.checkOut;
     const isEndDateOrBookingMarker = day.isEndDate || day.isRangeDate;
 
     const date = day.day as string;
@@ -39,20 +40,24 @@ export default class Calendar {
     if (
       canBeStartDate ||
       isEndDateOrBookingMarker ||
-      (day.isStartDate && startDayState)
+      (day.isStartDate && calendarState.checkIn)
     ) {
       if (periodIsUncompleted) {
         notifyIfPeriodIsUncompleted(
           presenter,
           date,
-          startDayState,
+          calendarState.checkIn,
+          calendarState,
+          initialMonths,
           this.props.timezone
         );
       } else if (periodIsCompleted) {
-        presenter.displayStartDate(date);
+        presenter.displayStartDate(date, initialMonths, calendarState);
       } else {
-        presenter.displayStartDate(date);
+        presenter.displayStartDate(date, calendarState.months, calendarState);
       }
+    } else {
+      presenter.displayInitializePeriod(initialMonths, calendarState);
     }
   }
 
@@ -60,14 +65,12 @@ export default class Calendar {
     presenter.paginate(operator, this.props.checkIn, this.props.checkOut);
   }
 
-  clearCalendar(presenter: CalendarPresenter) {
-    presenter.displayInitializePeriod();
-  }
-
-  private setActiveIndex(presenter: CalendarPresenter) {
-    if (this.props.checkIn && this.props.checkOut) {
-      presenter.setActiveIndex(this.props.checkIn, this.props.checkOut);
-    }
+  clearCalendar(
+    presenter: CalendarPresenter,
+    calendarState: CalendarVM,
+    initialMonths: MonthType[]
+  ) {
+    presenter.displayInitializePeriod(initialMonths, calendarState);
   }
 
   private setStartDateAndEndDate() {
@@ -79,27 +82,16 @@ export default class Calendar {
     }
   }
 
-  private setCheckInCheckOut(presenter: CalendarPresenter) {
-    if (this.props.checkIn && this.props.checkOut) {
-      presenter.displayEndDate(
-        dayFormatter(this.props.checkOut, "yyyy-MM-dd"),
-        dayFormatter(this.props.checkIn, "yyyy-MM-dd")
-      );
-
-      this.setActiveIndex(presenter);
-    }
-  }
-
   private setNbMonth(presenter: CalendarPresenter) {
     presenter.displayMonthRange(this.props.visualMonth);
   }
 
   build(presenter: CalendarPresenter) {
     this.setStartDateAndEndDate();
-    this.setCheckInCheckOut(presenter);
     this.setNbMonth(presenter);
 
     presenter.displayRangeDates(this.props.rangeDates);
+
     presenter.displayCalendar({
       period: {},
       checkIn: this.props.checkIn,

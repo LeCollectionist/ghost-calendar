@@ -1,8 +1,16 @@
-import { CalendarPresenter } from "../CalendarPresenter";
 import dayjs from "dayjs";
 
-import { DayType, MonthType, LocaleType, WorldTimezones } from "./types";
-import { dateHandler, dayFormatter } from "./date";
+import Day from "../Day";
+import { CalendarPresenter } from "../CalendarPresenter";
+import {
+  DayType,
+  MonthType,
+  LocaleType,
+  WorldTimezones,
+  Period,
+  BookingColorType,
+} from "./types";
+import { dateHandler, dayFormatter, isDatePassed } from "./date";
 
 export type DateType = dayjs.Dayjs;
 

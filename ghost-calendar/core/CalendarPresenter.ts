@@ -1,14 +1,20 @@
 import Month from "./Month";
 import Presenter from "./Presenter";
-
-import { getBookingDates, getMonthDiff } from "./helpers/utils";
+import {
+  checkBetweenDates,
+  getBookingDates,
+  getMonthDiff,
+} from "./helpers/utils";
 import {
   LocaleType,
   MonthType,
   Period,
   BookingColorType,
   WorldTimezones,
+  DayType,
 } from "./helpers/types";
+import { dateHandler } from "./helpers/date";
+import { createDay } from "./helpers/createDay";
 
 export class CalendarVM {
   checkOut = "";
@@ -49,27 +55,46 @@ export class CalendarPresenter extends Presenter<CalendarVM> {
     checkOut?: Date;
     bookingColors?: BookingColorType;
   }) {
-    this.vm.months = [];
-
-    for (let d = 0; d < this.dates.length; d++) {
-      const currentDate = this.dates[d];
-      this.vm.months.push(
-        new Month({
-          date: currentDate,
+    if (this.vm.months.length === 0) {
+      for (let d = 0; d < this.dates.length; d++) {
+        const currentDate = this.dates[d];
+        this.vm.months.push(
+          new Month({
+            date: currentDate,
+            period: props.period,
+            rangeDates: this.vm.rangeDates,
+            checkIn: props.checkIn,
+            checkOut: props.checkOut,
+            bookingColors: props.bookingColors,
+            timezone: this.timezone,
+          })
+            .getMonthKey()
+            .getMonthName(this.locale)
+            .getMonthYearKey()
+            .getMonthUniqueId()
+            .getMonth()
+            .getMonthIndex(d)
+            .build()
+        );
+      }
+    } else {
+      if (props.period && props.period.startDate) {
+        this.displaySelectedDate({
+          ...props,
           period: props.period,
+          selectedDate: props.period.startDate,
           rangeDates: this.vm.rangeDates,
-          checkIn: props.checkIn,
-          checkOut: props.checkOut,
-          bookingColors: props.bookingColors,
-          timezone: this.timezone,
-        })
-          .getMonthKey()
-          .getMonthName(this.locale)
-          .getMonthYearKey()
-          .getMonthUniqueId()
-          .getMonth()
-          .build()
-      );
+        });
+      }
+
+      if (props.period && props.period.endDate) {
+        this.displaySelectedDate({
+          ...props,
+          period: props.period,
+          selectedDate: props.period.endDate,
+          rangeDates: this.vm.rangeDates,
+        });
+      }
     }
 
     if (this.vm.visualMonth) {
@@ -113,6 +138,7 @@ export class CalendarPresenter extends Presenter<CalendarVM> {
 
   displayRangeDates(rangeDates: Required<Period>[]) {
     this.vm.rangeDates = rangeDates;
+    this.notifyVM();
   }
 
   displayMonthRange(max: number) {
@@ -122,16 +148,28 @@ export class CalendarPresenter extends Presenter<CalendarVM> {
       this.dates.push(tempNextMonth);
       this.nextMonth = tempNextMonth;
     }
+    this.notifyVM();
   }
 
-  displayInitializePeriod() {
+  displayInitializePeriod(months: MonthType[], calendarState: CalendarVM) {
     this.vm.checkIn = "";
     this.vm.checkOut = "";
+    this.vm.months = months;
+    this.vm.visualMonth = calendarState.visualMonth;
+    this.vm.rangeDates = calendarState.rangeDates;
+    this.notifyVM();
   }
 
-  displayStartDate(day: string) {
+  displayStartDate(
+    day: string,
+    months: MonthType[],
+    calendarState: CalendarVM
+  ) {
     this.vm.checkIn = day;
     this.vm.checkOut = "";
+    this.vm.months = months;
+    this.vm.visualMonth = calendarState.visualMonth;
+    this.vm.rangeDates = calendarState.rangeDates;
     this.displayCalendar({
       period: { startDate: day, endDate: "" },
       bookingColors: this.vm.bookingColors,
@@ -139,8 +177,17 @@ export class CalendarPresenter extends Presenter<CalendarVM> {
     this.notifyVM();
   }
 
-  displayEndDate(day: string, startDayState: string) {
+  displayEndDate(
+    day: string,
+    startDayState: string,
+    calendarState: CalendarVM,
+    initialMonths: MonthType[]
+  ) {
+    this.vm.months = calendarState.months;
+    this.vm.visualMonth = calendarState.visualMonth;
+    this.vm.rangeDates = calendarState.rangeDates;
     if (getBookingDates(this, startDayState, day, this.timezone).length > 0) {
+      this.vm.months = initialMonths;
       this.vm.checkIn = day;
       this.vm.checkOut = "";
     } else {
@@ -148,13 +195,75 @@ export class CalendarPresenter extends Presenter<CalendarVM> {
       this.vm.checkOut = day;
 
       if (this.vm.checkIn === this.vm.checkOut) {
-        this.displayInitializePeriod();
+        this.displayInitializePeriod(initialMonths, calendarState);
       }
     }
     this.displayCalendar({
       period: { startDate: this.vm.checkIn, endDate: this.vm.checkOut },
       bookingColors: this.vm.bookingColors,
     });
+    this.notifyVM();
+  }
+
+  private displaySelectedDate(props: {
+    period: Period;
+    selectedDate: string;
+    checkIn?: Date;
+    checkOut?: Date;
+    bookingColors?: BookingColorType;
+    rangeDates?: Required<Period>[];
+  }) {
+    const selectedDateMonthKey = new Date(props.selectedDate).getMonth();
+    const selectedDateYearKey = new Date(props.selectedDate).getFullYear();
+
+    const monthId = `${selectedDateMonthKey}-${selectedDateYearKey}`;
+
+    const selectedDateMonth = this.vm.months.find((el) => el.id === monthId);
+
+    const startDateDay = {
+      ...selectedDateMonth?.days.find((day) => day.day === props.selectedDate),
+    };
+
+    const monthsCopy = this.vm.months.filter((month) => month.id !== monthId);
+
+    this.vm.months = [
+      ...monthsCopy,
+      {
+        ...selectedDateMonth,
+        days: (selectedDateMonth?.days as DayType[]).map((dayOfmonth) => {
+          if (dayOfmonth.day === startDateDay.day) {
+            dayOfmonth = createDay({
+              day: dateHandler({
+                date: dayOfmonth.day,
+                timezone: this.timezone,
+              }),
+              ...props,
+            });
+          }
+
+          if (
+            props.period &&
+            props.period.startDate &&
+            props.period.endDate &&
+            checkBetweenDates(
+              props.period.startDate,
+              props.period.endDate,
+              dayOfmonth.day
+            )
+          ) {
+            dayOfmonth = createDay({
+              day: dateHandler({
+                date: dayOfmonth.day,
+                timezone: this.timezone,
+              }),
+              ...props,
+            });
+          }
+          return { ...dayOfmonth };
+        }),
+      },
+    ].sort((a, b) => Number(a.index) - Number(b.index));
+
     this.notifyVM();
   }
 

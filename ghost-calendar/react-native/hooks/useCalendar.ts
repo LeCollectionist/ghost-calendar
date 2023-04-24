@@ -23,6 +23,30 @@ type CalendarProps = {
   timezone?: WorldTimezones;
 };
 
+const createCalendar = ({
+  locale,
+  startDate,
+  endDate,
+  checkIn,
+  checkOut,
+  rangeDates,
+  visualMonth,
+  bookingColors,
+  timezone,
+}: CalendarProps) => ({
+  calendar: new Calendar({
+    startDate,
+    endDate,
+    checkIn,
+    checkOut,
+    rangeDates,
+    visualMonth,
+    bookingColors,
+    timezone,
+  }),
+  presenter: new CalendarPresenter(locale, startDate, timezone),
+});
+
 export const useCalendar = ({
   locale,
   startDate,
@@ -34,10 +58,8 @@ export const useCalendar = ({
   bookingColors,
   timezone,
 }: CalendarProps) => {
-  const [calendarState, setCalendarState] = useState<CalendarVM | null>(null);
-
-  const presenter = new CalendarPresenter(locale, startDate, timezone);
-  const calendar = new Calendar({
+  const { calendar, presenter } = createCalendar({
+    locale,
     startDate,
     endDate,
     checkIn,
@@ -47,17 +69,12 @@ export const useCalendar = ({
     bookingColors,
     timezone,
   });
-
-  calendar.build(presenter);
+  const [calendarState, setCalendarState] = useState<CalendarVM>(presenter.vm);
+  const [initialMonths, setInitialMonths] = useState(presenter.vm.months);
 
   const setPeriod = (day: DayType) => {
     if (calendarState) {
-      calendar.setPeriod(
-        presenter,
-        day,
-        calendarState.checkIn,
-        calendarState.checkOut
-      );
+      calendar.setPeriod(presenter, day, calendarState, initialMonths);
 
       presenter.subscribeVM((calendar) => {
         setCalendarState(calendar);
@@ -66,7 +83,7 @@ export const useCalendar = ({
   };
 
   const clearCalendar = () => {
-    calendar.clearCalendar(presenter);
+    calendar.clearCalendar(presenter, calendarState, initialMonths);
 
     presenter.subscribeVM((calendar) => {
       setCalendarState(calendar);
@@ -82,8 +99,10 @@ export const useCalendar = ({
   };
 
   useEffect(() => {
+    calendar.build(presenter);
     presenter.subscribeVM((calendar) => {
       setCalendarState(calendar);
+      setInitialMonths(calendar.months);
     });
   }, []);
 

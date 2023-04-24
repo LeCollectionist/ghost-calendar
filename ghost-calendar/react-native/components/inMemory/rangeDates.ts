@@ -29,8 +29,8 @@ export const rangeDates: Required<Period>[] = [
     otherType: "Bookings::Admin",
   },
   {
-    startDate: "2023-06-15",
-    endDate: "2023-06-18",
+    startDate: "2023-05-17",
+    endDate: "2023-05-21",
     type: "other",
     checkInTime: 17,
     checkOutTime: 10,
@@ -38,8 +38,8 @@ export const rangeDates: Required<Period>[] = [
     otherType: "Bookings::Admin",
   },
   {
-    startDate: "2022-09-18",
-    endDate: "2022-09-21",
+    startDate: "2023-05-30",
+    endDate: "2023-05-31",
     type: "option",
     checkInTime: 17,
     checkOutTime: 10,

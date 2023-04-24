@@ -44,6 +44,7 @@ export type MonthType = {
   monthKey?: number;
   yearKey?: number;
   monthName?: string;
+  index?: number;
 };
 
 export type Period = {

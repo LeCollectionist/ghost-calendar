@@ -1,12 +1,14 @@
-import { CalendarPresenter } from "../CalendarPresenter";
+import { CalendarPresenter, CalendarVM } from "../CalendarPresenter";
 import { dateHandler } from "./date";
-import { WorldTimezones } from "./types";
+import { MonthType, WorldTimezones } from "./types";
 import { checkCurrentDayAndPastDay } from "./utils";
 
 export const notifyIfPeriodIsUncompleted = (
   presenter: CalendarPresenter,
   day: string,
   startDayState: string,
+  calendarState: CalendarVM,
+  initialMonths: MonthType[],
   timezone?: WorldTimezones
 ) => {
   if (
@@ -15,8 +17,8 @@ export const notifyIfPeriodIsUncompleted = (
       dateHandler({ date: startDayState, timezone })
     )
   ) {
-    presenter.displayStartDate(day);
+    presenter.displayStartDate(day, initialMonths, calendarState);
   } else {
-    presenter.displayEndDate(day, startDayState);
+    presenter.displayEndDate(day, startDayState, calendarState, initialMonths);
   }
 };

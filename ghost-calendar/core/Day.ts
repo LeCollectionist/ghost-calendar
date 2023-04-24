@@ -137,7 +137,7 @@ export default class Day {
     return this;
   }
 
-  private isBooking(day: Required<Period>) {
+  isBooking(day: Required<Period>) {
     if (day.startDate === this.day.day) {
       this.day.isStartDate = true;
       this.day.isBooking = true;
