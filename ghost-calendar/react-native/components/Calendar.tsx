@@ -59,16 +59,6 @@ const CalendarComponent = ({
     timezone,
   });
 
-  useEffect(() => {
-    if (rangeMarkerHandler) {
-      rangeMarkerHandler({
-        startDate: calendar?.checkIn || "",
-        endDate: calendar?.checkOut || "",
-        resetCalendar: () => resetCalendar(),
-      });
-    }
-  }, [calendar]);
-
   if (!calendar) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
@@ -102,6 +92,12 @@ const CalendarComponent = ({
               setPeriod={setPeriod}
               withInteraction={withInteraction}
               hasCompletedRange={hasCompletedRange}
+              rangeMarkerHandler={rangeMarkerHandler}
+              period={{
+                startDate: calendar.checkIn,
+                endDate: calendar.checkOut,
+                resetCalendar,
+              }}
             />
             {index === calendar.months.length - 1 && (
               <View style={{ marginBottom: 80 }} />

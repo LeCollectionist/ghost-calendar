@@ -78,7 +78,7 @@ export class CalendarPresenter extends Presenter<CalendarVM> {
         );
       }
     } else {
-      if (props.period && props.period.startDate) {
+      if (props.period && props.period.startDate && !props.period.endDate) {
         this.displaySelectedDate({
           ...props,
           period: props.period,
@@ -87,7 +87,7 @@ export class CalendarPresenter extends Presenter<CalendarVM> {
         });
       }
 
-      if (props.period && props.period.endDate) {
+      if (props.period && props.period.startDate && props.period.endDate) {
         this.displaySelectedDate({
           ...props,
           period: props.period,
