@@ -16,6 +16,7 @@ export const Month = memo(
     hasCompletedRange,
     rangeMarkerHandler,
     resetCalendar,
+    calendar,
   }: {
     month: MonthType;
     editMode: boolean;
@@ -25,6 +26,7 @@ export const Month = memo(
     hasCompletedRange?: (hasCompletedRange: boolean) => void;
     rangeMarkerHandler?: (info: RangeType) => void;
     resetCalendar: () => void;
+    calendar: CalendarVM;
   }) => (
     <>
       <View style={{ marginBottom: 10, marginTop: 0, paddingLeft: 19 }}>
@@ -46,6 +48,7 @@ export const Month = memo(
           days={month.days}
           setPeriod={setPeriod}
           resetCalendar={resetCalendar}
+          calendar={calendar}
         />
       ) : (
         <Days
@@ -56,6 +59,7 @@ export const Month = memo(
           hasCompletedRange={hasCompletedRange}
           rangeMarkerHandler={rangeMarkerHandler}
           resetCalendar={resetCalendar}
+          calendar={calendar}
         />
       )}
     </>

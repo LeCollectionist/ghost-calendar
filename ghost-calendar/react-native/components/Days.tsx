@@ -1,4 +1,5 @@
 import { memo } from "react";
+import dayjs from "dayjs";
 import { View, Text, Pressable, Image } from "react-native";
 import { CalendarVM, DayType } from "../../core";
 import * as Haptics from "expo-haptics";
@@ -19,6 +20,7 @@ import {
 import { CurrentDayPointer } from "./CurrentDayPointer";
 import { CheckIn, CheckOut, CheckInCheckOut } from "./PeriodDelimiter";
 import { RangeType } from "./types";
+import { getBookingDateUi } from "../../core/helpers/utils";
 
 let daysT: string[] = [];
 let daysD: string[] = [];
@@ -31,6 +33,7 @@ export type DayComponentType = {
   hasCompletedRange?: (hasCompletedRange: boolean) => void;
   rangeMarkerHandler?: (info: RangeType) => void;
   resetCalendar: () => void;
+  calendar: CalendarVM;
 };
 
 type CheckMarkerType = {
@@ -80,79 +83,90 @@ const ajouterElementD = (nouvelElement: string): void => {
   }
 };
 
-export const Days = memo(
-  ({
-    bookingDayHandler,
-    days,
-    setPeriod,
-    withInteraction,
-    hasCompletedRange,
-    rangeMarkerHandler,
-    resetCalendar,
-  }: DayComponentType) => {
-    const onPress = (day: DayType) => {
-      if (hasCompletedRange && day.day) {
-        ajouterElement(day.day);
-        hasCompletedRange(daysT.length === 2);
-      }
-      if (day.isBooking && bookingDayHandler) bookingDayHandler(day);
+export const Days = ({
+  bookingDayHandler,
+  days,
+  setPeriod,
+  withInteraction,
+  hasCompletedRange,
+  rangeMarkerHandler,
+  resetCalendar,
+  calendar,
+}: DayComponentType) => {
+  const onPress = (day: DayType, calendar: CalendarVM) => {
+    if (hasCompletedRange && day.day) {
+      ajouterElement(day.day);
+      hasCompletedRange(daysT.length === 2);
+    }
+    if (day.isBooking && bookingDayHandler) bookingDayHandler(day);
 
-      if (withInteraction) {
-        setPeriod(day);
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-      }
+    if (withInteraction) {
+      setPeriod(day);
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    }
 
-      if (rangeMarkerHandler && day.day && !day.isBooking) {
+    if (
+      rangeMarkerHandler &&
+      day.day &&
+      ((day.isBooking && (day.isStartDate || day.isEndDate)) || !day.isBooking)
+    ) {
+      ajouterElementD(day.day);
+
+      if (dayjs(daysD[1]).diff(daysD[0]) < 0 && daysD.length === 2) {
         ajouterElementD(day.day);
-
-        rangeMarkerHandler({
-          startDate: daysD[0] || "",
-          endDate: daysD[1] || "",
-          resetCalendar: () => resetCalendar(),
-        });
       }
-    };
 
-    const renderDays = days.map((day, idx) => {
-      const isBookingOption =
-        day.bookingType === "option" && !day.isStartDate && !day.isEndDate;
-      return (
-        <Pressable
-          onPress={() => onPress(day)}
-          style={styleSelector(day)}
-          key={`${day.day}${idx}`}
-        >
-          {day.isCurrentDay && <CurrentDayPointer />}
-          <CheckMarker day={day} days={days} index={idx} />
-          {isBookingOption && (
-            <Image
-              source={require("./optionFull.png")}
-              style={calendarStyle.ach}
-            />
-          )}
-          <Text
-            style={{
-              ...(getCurrentDayColor(day) as {}),
-              zIndex: 3,
-            }}
-          >
-            {day.dayNumber}
-          </Text>
-        </Pressable>
-      );
-    });
+      if (getBookingDateUi(calendar, daysD[0], daysD[1]).length > 0) {
+        ajouterElementD(day.day);
+      }
 
+      rangeMarkerHandler({
+        startDate: daysD[0] || "",
+        endDate: daysD[1] || "",
+        resetCalendar: () => resetCalendar(),
+      });
+    }
+  };
+
+  const renderDays = days.map((day, idx) => {
+    const isBookingOption =
+      day.bookingType === "option" && !day.isStartDate && !day.isEndDate;
     return (
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "center",
-          flexWrap: "wrap",
-          width: "100%",
-        }}
+      <Pressable
+        onPress={() => onPress(day, calendar)}
+        style={styleSelector(day)}
+        key={`${day.day}${idx}`}
       >
-        {renderDays}
-      </View>
+        {day.isCurrentDay && <CurrentDayPointer />}
+        <CheckMarker day={day} days={days} index={idx} />
+        {isBookingOption && (
+          <Image
+            source={require("./optionFull.png")}
+            style={calendarStyle.ach}
+          />
+        )}
+        <Text
+          style={{
+            ...(getCurrentDayColor(day) as {}),
+            zIndex: 3,
+          }}
+        >
+          {day.dayNumber}
+        </Text>
+      </Pressable>
     );
-  }
-);
+  });
+
+  return (
+    <View
+      style={{
+        flexDirection: "row",
+        justifyContent: "center",
+        flexWrap: "wrap",
+        width: "100%",
+      }}
+    >
+      {renderDays}
+    </View>
+  );
+};

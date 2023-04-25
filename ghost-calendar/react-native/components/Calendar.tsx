@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { View, ActivityIndicator, FlatList } from "react-native";
 import {
   BookingColorType,
@@ -94,6 +93,7 @@ const CalendarComponent = ({
               hasCompletedRange={hasCompletedRange}
               rangeMarkerHandler={rangeMarkerHandler}
               resetCalendar={resetCalendar}
+              calendar={calendar}
             />
             {index === calendar.months.length - 1 && (
               <View style={{ marginBottom: 80 }} />

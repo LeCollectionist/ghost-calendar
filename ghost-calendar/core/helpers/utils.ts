@@ -1,16 +1,8 @@
 import dayjs from "dayjs";
 
-import Day from "../Day";
-import { CalendarPresenter } from "../CalendarPresenter";
-import {
-  DayType,
-  MonthType,
-  LocaleType,
-  WorldTimezones,
-  Period,
-  BookingColorType,
-} from "./types";
-import { dateHandler, dayFormatter, isDatePassed } from "./date";
+import { CalendarPresenter, CalendarVM } from "../CalendarPresenter";
+import { DayType, MonthType, LocaleType, WorldTimezones } from "./types";
+import { dateHandler, dayFormatter } from "./date";
 
 export type DateType = dayjs.Dayjs;
 
@@ -162,6 +154,55 @@ export const getBookingDates = (
   } else if (startDateYear < endDateYear) {
     const fistMonthFound = findMonth(presenter, startDateMonth, startDateYear);
     const secondMonthFound = findMonth(presenter, endDateMonth, endDateYear);
+
+    pushBookingDates(fistMonthFound, startDate, endDate, bookingDate);
+    pushBookingDates(secondMonthFound, startDate, endDate, bookingDate);
+  }
+
+  return bookingDate;
+};
+
+const findMonthT = (
+  presenter: CalendarVM,
+  endDateMonth: number,
+  endDateYear: number
+) => {
+  return presenter.months.find((month) => {
+    if (month.monthKey === endDateMonth && month.yearKey === endDateYear) {
+      return month;
+    }
+  });
+};
+
+// Todo: Refacto this function
+export const getBookingDateUi = (
+  calendar: CalendarVM,
+  startDayState: string,
+  endDayState: string,
+  timezone?: WorldTimezones
+) => {
+  const endDate = dateHandler({ date: endDayState, timezone });
+  const startDate = dateHandler({ date: startDayState, timezone });
+  const bookingDate: DayType[] = [];
+
+  const startDateMonth = startDate.get("month");
+  const startDateYear = startDate.get("year");
+  const endDateMonth = endDate.get("month");
+  const endDateYear = endDate.get("year");
+
+  if (endDateMonth === startDateMonth) {
+    const monthFound = findMonthT(calendar, endDateMonth, endDateYear);
+
+    pushBookingDates(monthFound, startDate, endDate, bookingDate);
+  } else if (endDateMonth > startDateMonth && startDateYear === endDateYear) {
+    const fistMonthFound = findMonthT(calendar, startDateMonth, startDateYear);
+    const secondMonthFound = findMonthT(calendar, endDateMonth, endDateYear);
+
+    pushBookingDates(fistMonthFound, startDate, endDate, bookingDate);
+    pushBookingDates(secondMonthFound, startDate, endDate, bookingDate);
+  } else if (startDateYear < endDateYear) {
+    const fistMonthFound = findMonthT(calendar, startDateMonth, startDateYear);
+    const secondMonthFound = findMonthT(calendar, endDateMonth, endDateYear);
 
     pushBookingDates(fistMonthFound, startDate, endDate, bookingDate);
     pushBookingDates(secondMonthFound, startDate, endDate, bookingDate);
