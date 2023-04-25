@@ -1,6 +1,6 @@
 import { memo } from "react";
 import { View, Text, Pressable, Image } from "react-native";
-import { DayType } from "../../core";
+import { CalendarVM, DayType } from "../../core";
 import * as Haptics from "expo-haptics";
 
 import {
@@ -21,6 +21,7 @@ import { CheckIn, CheckOut, CheckInCheckOut } from "./PeriodDelimiter";
 import { RangeType } from "./types";
 
 let daysT: string[] = [];
+let daysD: string[] = [];
 
 export type DayComponentType = {
   bookingDayHandler?: (day: DayType) => void;
@@ -29,7 +30,7 @@ export type DayComponentType = {
   withInteraction: boolean;
   hasCompletedRange?: (hasCompletedRange: boolean) => void;
   rangeMarkerHandler?: (info: RangeType) => void;
-  period: RangeType;
+  resetCalendar: () => void;
 };
 
 type CheckMarkerType = {
@@ -71,6 +72,14 @@ const ajouterElement = (nouvelElement: string): void => {
   }
 };
 
+const ajouterElementD = (nouvelElement: string): void => {
+  if (daysD.length < 2) {
+    daysD.push(nouvelElement);
+  } else {
+    daysD.splice(0, 2, nouvelElement);
+  }
+};
+
 export const Days = memo(
   ({
     bookingDayHandler,
@@ -79,7 +88,7 @@ export const Days = memo(
     withInteraction,
     hasCompletedRange,
     rangeMarkerHandler,
-    period,
+    resetCalendar,
   }: DayComponentType) => {
     const onPress = (day: DayType) => {
       if (hasCompletedRange && day.day) {
@@ -93,11 +102,13 @@ export const Days = memo(
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
       }
 
-      if (rangeMarkerHandler) {
+      if (rangeMarkerHandler && day.day && !day.isBooking) {
+        ajouterElementD(day.day);
+
         rangeMarkerHandler({
-          startDate: period.startDate || "",
-          endDate: period.endDate || "",
-          resetCalendar: () => period.resetCalendar(),
+          startDate: daysD[0] || "",
+          endDate: daysD[1] || "",
+          resetCalendar: () => resetCalendar(),
         });
       }
     };

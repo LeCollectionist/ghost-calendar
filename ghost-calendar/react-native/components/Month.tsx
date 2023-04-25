@@ -1,5 +1,5 @@
 import { View, Text } from "react-native";
-import { DayType, MonthType } from "../../core";
+import { CalendarVM, DayType, MonthType } from "../../core";
 
 import { Days } from "./Days";
 import { EditModeDays } from "./EditModeDays";
@@ -15,7 +15,7 @@ export const Month = memo(
     withInteraction,
     hasCompletedRange,
     rangeMarkerHandler,
-    period,
+    resetCalendar,
   }: {
     month: MonthType;
     editMode: boolean;
@@ -24,7 +24,7 @@ export const Month = memo(
     withInteraction: boolean;
     hasCompletedRange?: (hasCompletedRange: boolean) => void;
     rangeMarkerHandler?: (info: RangeType) => void;
-    period: RangeType;
+    resetCalendar: () => void;
   }) => (
     <>
       <View style={{ marginBottom: 10, marginTop: 20, paddingLeft: 19 }}>
@@ -45,7 +45,7 @@ export const Month = memo(
           bookingDayHandler={bookingDayHandler}
           days={month.days}
           setPeriod={setPeriod}
-          period={period}
+          resetCalendar={resetCalendar}
         />
       ) : (
         <Days
@@ -55,7 +55,7 @@ export const Month = memo(
           withInteraction={withInteraction}
           hasCompletedRange={hasCompletedRange}
           rangeMarkerHandler={rangeMarkerHandler}
-          period={period}
+          resetCalendar={resetCalendar}
         />
       )}
     </>

@@ -93,11 +93,7 @@ const CalendarComponent = ({
               withInteraction={withInteraction}
               hasCompletedRange={hasCompletedRange}
               rangeMarkerHandler={rangeMarkerHandler}
-              period={{
-                startDate: calendar.checkIn,
-                endDate: calendar.checkOut,
-                resetCalendar,
-              }}
+              resetCalendar={resetCalendar}
             />
             {index === calendar.months.length - 1 && (
               <View style={{ marginBottom: 80 }} />
