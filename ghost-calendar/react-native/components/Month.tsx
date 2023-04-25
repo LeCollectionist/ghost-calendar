@@ -27,7 +27,7 @@ export const Month = memo(
     resetCalendar: () => void;
   }) => (
     <>
-      <View style={{ marginBottom: 10, marginTop: 20, paddingLeft: 19 }}>
+      <View style={{ marginBottom: 10, marginTop: 0, paddingLeft: 19 }}>
         <Text
           style={{
             fontWeight: "bold",
