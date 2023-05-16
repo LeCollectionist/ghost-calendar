@@ -99,14 +99,12 @@ export const useCalendar = ({
   };
 
   useEffect(() => {
-    if (!calendarStore) {
-      calendar.build(presenter);
-      setCalendarStore(presenter.vm);
+    calendar.build(presenter);
+    setCalendarStore(presenter.vm);
 
-      presenter.subscribeVM((calendar) => {
-        setInitialMonths(calendar.months);
-      });
-    }
+    presenter.subscribeVM((calendar) => {
+      setInitialMonths(calendar.months);
+    });
   }, []);
 
   return {
