@@ -100,7 +100,10 @@ export const useCalendar = ({
 
   useEffect(() => {
     calendar.build(presenter);
-    setCalendarStore(presenter.vm);
+
+    if (!calendarStore) {
+      setCalendarStore(presenter.vm);
+    }
 
     presenter.subscribeVM((calendar) => {
       setInitialMonths(calendar.months);
