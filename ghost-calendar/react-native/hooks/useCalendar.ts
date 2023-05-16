@@ -99,9 +99,8 @@ export const useCalendar = ({
   };
 
   useEffect(() => {
-    calendar.build(presenter);
-
     if (!calendarStore) {
+      calendar.build(presenter);
       setCalendarStore(presenter.vm);
     }
 
