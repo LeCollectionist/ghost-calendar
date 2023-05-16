@@ -1,10 +1,17 @@
 import { useState } from "react";
-import { View, Button } from "react-native";
+import { View, Button, Text } from "react-native";
+import { Provider, useDispatch, useSelector } from "react-redux";
+import { NavigationContainer } from "@react-navigation/native";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+
 import {
   CalendarComponent,
   rangeDates,
   RangeType,
 } from "./react-native/components";
+import { AppDispatch, RootState, store } from "./react-native/store";
+import { setCalendar } from "./react-native/store/calendarSlices";
+import { CalendarVM } from "./core";
 
 const fullYear = new Date().getFullYear();
 const month = new Date().getMonth();
@@ -12,8 +19,20 @@ const month = new Date().getMonth();
 const startDateCalendar = new Date(fullYear, month, 1);
 const endDateCalendar = new Date(fullYear + 1, month + 2, 1);
 
-export default function App() {
+function HomeScreen() {
+  return (
+    <View>
+      <Text>Home</Text>
+    </View>
+  );
+}
+
+function CalendarScreen() {
   const [showRange, setShowRange] = useState<RangeType | null>(null);
+  const dispatch = useDispatch<AppDispatch>();
+  const { calendar } = useSelector((state: RootState) => state.calendar);
+
+  const setCalendarStore = (vm: CalendarVM) => dispatch(setCalendar(vm));
 
   return (
     <View>
@@ -35,6 +54,8 @@ export default function App() {
           console.log("hasCompletedRange", hasCompletedRange)
         }
         timezone="Europe/Paris"
+        setCalendarStore={setCalendarStore}
+        calendarStore={calendar}
       />
       {showRange && (
         <View
@@ -56,5 +77,20 @@ export default function App() {
         </View>
       )}
     </View>
+  );
+}
+
+const Tab = createBottomTabNavigator();
+
+export default function App() {
+  return (
+    <Provider store={store}>
+      <NavigationContainer>
+        <Tab.Navigator>
+          <Tab.Screen name="Home" component={HomeScreen} />
+          <Tab.Screen name="Calendar" component={CalendarScreen} />
+        </Tab.Navigator>
+      </NavigationContainer>
+    </Provider>
   );
 }

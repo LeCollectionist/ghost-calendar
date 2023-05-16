@@ -1,6 +1,7 @@
 import { View, ActivityIndicator, FlatList } from "react-native";
 import {
   BookingColorType,
+  CalendarVM,
   DayType,
   LocaleType,
   Period,
@@ -28,6 +29,8 @@ type CalendarComponentType = {
   withInteraction?: boolean;
   hasCompletedRange?: (hasCompletedRange: boolean) => void;
   timezone?: WorldTimezones;
+  calendarStore: CalendarVM | null;
+  setCalendarStore: (vm: CalendarVM) => void;
 };
 
 const CalendarComponent = ({
@@ -45,6 +48,8 @@ const CalendarComponent = ({
   withInteraction = false,
   hasCompletedRange,
   timezone,
+  calendarStore,
+  setCalendarStore,
 }: CalendarComponentType) => {
   const { calendar, setPeriod, resetCalendar } = useCalendar({
     bookingColors,
@@ -56,6 +61,8 @@ const CalendarComponent = ({
     startDate,
     visualMonth,
     timezone,
+    calendarStore,
+    setCalendarStore,
   });
 
   if (!calendar) {
