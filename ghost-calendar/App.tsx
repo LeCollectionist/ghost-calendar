@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { View, Button, Text } from "react-native";
 import { Provider, useDispatch, useSelector } from "react-redux";
 import { NavigationContainer } from "@react-navigation/native";
@@ -12,6 +12,7 @@ import {
 import { AppDispatch, RootState, store } from "./react-native/store";
 import { setCalendar } from "./react-native/store/calendarSlices";
 import { CalendarVM } from "./core";
+import { createCalendar } from "./react-native/hooks/useCalendar";
 
 const fullYear = new Date().getFullYear();
 const month = new Date().getMonth();
@@ -33,6 +34,20 @@ function CalendarScreen() {
   const { calendar } = useSelector((state: RootState) => state.calendar);
 
   const setCalendarStore = (vm: CalendarVM) => dispatch(setCalendar(vm));
+
+  const { calendar: calendarBuild, presenter } = createCalendar({
+    locale: "fr",
+    startDate: startDateCalendar,
+    endDate: endDateCalendar,
+    rangeDates,
+    visualMonth: 24,
+    bookingColors: {},
+    timezone: "Europe/Paris",
+  });
+
+  useEffect(() => {
+    calendarBuild.build(presenter);
+  }, []);
 
   return (
     <View>
@@ -56,6 +71,8 @@ function CalendarScreen() {
         timezone="Europe/Paris"
         setCalendarStore={setCalendarStore}
         calendarStore={calendar}
+        calendarBuild={calendarBuild}
+        calendarPresenter={presenter}
       />
       {showRange && (
         <View

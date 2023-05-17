@@ -23,9 +23,11 @@ type CalendarProps = {
   timezone?: WorldTimezones;
   calendarStore: CalendarVM | null;
   setCalendarStore: (vm: CalendarVM) => void;
+  calendarBuild: Calendar;
+  calendarPresenter: CalendarPresenter;
 };
 
-const createCalendar = ({
+export const createCalendar = ({
   locale,
   startDate,
   endDate,
@@ -35,7 +37,10 @@ const createCalendar = ({
   visualMonth,
   bookingColors,
   timezone,
-}: Omit<CalendarProps, "calendarStore" | "setCalendarStore">) => ({
+}: Omit<
+  CalendarProps,
+  "calendarStore" | "setCalendarStore" | "calendarBuild" | "calendarPresenter"
+>) => ({
   calendar: new Calendar({
     startDate,
     endDate,
@@ -61,50 +66,50 @@ export const useCalendar = ({
   timezone,
   calendarStore,
   setCalendarStore,
+  calendarBuild,
+  calendarPresenter,
 }: CalendarProps) => {
-  const { calendar, presenter } = createCalendar({
-    locale,
-    startDate,
-    endDate,
-    checkIn,
-    checkOut,
-    rangeDates,
-    visualMonth,
-    bookingColors,
-    timezone,
-  });
-
-  const [initialMonths, setInitialMonths] = useState(presenter.vm.months);
+  const [initialMonths, setInitialMonths] = useState(
+    calendarPresenter.vm.months
+  );
 
   const setPeriod = (day: DayType) => {
     if (calendarStore) {
-      calendar.setPeriod(presenter, day, calendarStore, initialMonths);
+      calendarBuild.setPeriod(
+        calendarPresenter,
+        day,
+        calendarStore,
+        initialMonths
+      );
 
-      setCalendarStore(presenter.vm);
+      setCalendarStore(calendarPresenter.vm);
     }
   };
 
   const clearCalendar = () => {
     if (calendarStore) {
-      calendar.clearCalendar(presenter, calendarStore, initialMonths);
+      calendarBuild.clearCalendar(
+        calendarPresenter,
+        calendarStore,
+        initialMonths
+      );
 
-      setCalendarStore(presenter.vm);
+      setCalendarStore(calendarPresenter.vm);
     }
   };
 
   const setPaginate = (operator: string) => {
-    calendar.paginate(presenter, operator);
+    calendarBuild.paginate(calendarPresenter, operator);
 
-    setCalendarStore(presenter.vm);
+    setCalendarStore(calendarPresenter.vm);
   };
 
   useEffect(() => {
     if (!calendarStore) {
-      calendar.build(presenter);
-      setCalendarStore(presenter.vm);
+      setCalendarStore(calendarPresenter.vm);
     }
 
-    presenter.subscribeVM((calendar) => {
+    calendarPresenter.subscribeVM((calendar) => {
       setInitialMonths(calendar.months);
     });
   }, []);

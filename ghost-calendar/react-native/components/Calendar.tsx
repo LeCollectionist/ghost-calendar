@@ -1,6 +1,8 @@
 import { View, ActivityIndicator, FlatList } from "react-native";
 import {
   BookingColorType,
+  Calendar,
+  CalendarPresenter,
   CalendarVM,
   DayType,
   LocaleType,
@@ -31,6 +33,8 @@ type CalendarComponentType = {
   timezone?: WorldTimezones;
   calendarStore: CalendarVM | null;
   setCalendarStore: (vm: CalendarVM) => void;
+  calendarBuild: Calendar;
+  calendarPresenter: CalendarPresenter;
 };
 
 const CalendarComponent = ({
@@ -50,6 +54,8 @@ const CalendarComponent = ({
   timezone,
   calendarStore,
   setCalendarStore,
+  calendarBuild,
+  calendarPresenter,
 }: CalendarComponentType) => {
   const { calendar, setPeriod, resetCalendar } = useCalendar({
     bookingColors,
@@ -63,6 +69,8 @@ const CalendarComponent = ({
     timezone,
     calendarStore,
     setCalendarStore,
+    calendarBuild,
+    calendarPresenter,
   });
 
   if (!calendar) {

@@ -1,9 +1,12 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { createCalendar } from "../hooks/useCalendar";
 
 const calendarSlice = createSlice({
   name: "calendar",
   initialState: {
     calendar: null,
+    calendarBuild: null,
+    calendarPresenter: null,
   },
   reducers: {
     setCalendar(state, action) {
