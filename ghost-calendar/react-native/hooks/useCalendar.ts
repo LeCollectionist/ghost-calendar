@@ -87,8 +87,8 @@ export const useCalendar = ({
   };
 
   useEffect(() => {
-    setCalendar(calendar);
     newCalendar.presenter.subscribeVM((calendar) => {
+      setCalendar(calendar);
       setInitialMonths(calendar.months);
     });
   }, []);
