@@ -15,62 +15,33 @@ import { useCalendar } from "../hooks/useCalendar";
 import { RangeType } from "./types";
 import { Month } from "./Month";
 import { Week } from "./Week";
+import { useEffect } from "react";
 
 type CalendarComponentType = {
   bookingColors?: BookingColorType;
   bookingDayHandler?: (day: DayType) => void;
-  checkIn?: Date;
-  checkOut?: Date;
   editMode?: boolean;
-  endDate: Date;
-  locale?: LocaleType;
-  rangeDates: Required<Period>[];
   rangeMarkerHandler?: (info: RangeType) => void;
-  startDate: Date;
-  visualMonth: number;
   withInteraction?: boolean;
   hasCompletedRange?: (hasCompletedRange: boolean) => void;
-  timezone?: WorldTimezones;
-  calendarStore: CalendarVM | null;
-  setCalendarStore: (vm: CalendarVM) => void;
-  calendarBuild: Calendar;
-  calendarPresenter: CalendarPresenter;
+  newCalendar: {
+    calendar: Calendar;
+    presenter: CalendarPresenter;
+  };
+  locale: LocaleType;
 };
 
 const CalendarComponent = ({
-  bookingColors = {},
   bookingDayHandler,
-  checkIn,
-  checkOut,
   editMode = false,
-  endDate,
-  locale,
-  rangeDates,
   rangeMarkerHandler,
-  startDate,
-  visualMonth,
   withInteraction = false,
   hasCompletedRange,
-  timezone,
-  calendarStore,
-  setCalendarStore,
-  calendarBuild,
-  calendarPresenter,
+  newCalendar,
+  locale,
 }: CalendarComponentType) => {
   const { calendar, setPeriod, resetCalendar } = useCalendar({
-    bookingColors,
-    checkIn,
-    checkOut,
-    endDate,
-    locale,
-    rangeDates,
-    startDate,
-    visualMonth,
-    timezone,
-    calendarStore,
-    setCalendarStore,
-    calendarBuild,
-    calendarPresenter,
+    newCalendar,
   });
 
   if (!calendar) {

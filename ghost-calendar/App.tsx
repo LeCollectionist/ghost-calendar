@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { View, Button, Text } from "react-native";
-import { Provider, useDispatch, useSelector } from "react-redux";
+import { Provider } from "react-redux";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
@@ -9,9 +9,7 @@ import {
   rangeDates,
   RangeType,
 } from "./react-native/components";
-import { AppDispatch, RootState, store } from "./react-native/store";
-import { setCalendar } from "./react-native/store/calendarSlices";
-import { CalendarVM } from "./core";
+import { store } from "./react-native/store";
 import { createCalendar } from "./react-native/hooks/useCalendar";
 
 const fullYear = new Date().getFullYear();
@@ -19,6 +17,16 @@ const month = new Date().getMonth();
 
 const startDateCalendar = new Date(fullYear, month, 1);
 const endDateCalendar = new Date(fullYear + 1, month + 2, 1);
+
+const newCalendar = createCalendar({
+  locale: "fr",
+  startDate: startDateCalendar,
+  endDate: endDateCalendar,
+  rangeDates: [],
+  visualMonth: 12,
+  bookingColors: {},
+  timezone: "Europe/Paris",
+});
 
 function HomeScreen() {
   return (
@@ -30,29 +38,16 @@ function HomeScreen() {
 
 function CalendarScreen() {
   const [showRange, setShowRange] = useState<RangeType | null>(null);
-  const dispatch = useDispatch<AppDispatch>();
-  const { calendar } = useSelector((state: RootState) => state.calendar);
-
-  const setCalendarStore = (vm: CalendarVM) => dispatch(setCalendar(vm));
-
-  const { calendar: calendarBuild, presenter } = createCalendar({
-    locale: "fr",
-    startDate: startDateCalendar,
-    endDate: endDateCalendar,
-    rangeDates,
-    visualMonth: 24,
-    bookingColors: {},
-    timezone: "Europe/Paris",
-  });
 
   useEffect(() => {
-    calendarBuild.build(presenter);
+    newCalendar.calendar.build(newCalendar.presenter);
   }, []);
 
   return (
     <View>
       <CalendarComponent
         withInteraction
+        locale="fr"
         bookingDayHandler={(booking) => {
           console.log("booking", booking);
         }}
@@ -60,19 +55,10 @@ function CalendarScreen() {
           console.log("range", range);
           if (range) setShowRange(range);
         }}
-        locale="fr"
-        startDate={startDateCalendar}
-        endDate={endDateCalendar}
-        visualMonth={24}
-        rangeDates={rangeDates}
         hasCompletedRange={(hasCompletedRange) =>
           console.log("hasCompletedRange", hasCompletedRange)
         }
-        timezone="Europe/Paris"
-        setCalendarStore={setCalendarStore}
-        calendarStore={calendar}
-        calendarBuild={calendarBuild}
-        calendarPresenter={presenter}
+        newCalendar={newCalendar}
       />
       {showRange && (
         <View

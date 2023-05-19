@@ -83,6 +83,8 @@ const ajouterElementD = (nouvelElement: string): void => {
   }
 };
 
+let test = [];
+
 export const Days = ({
   bookingDayHandler,
   days,
@@ -111,6 +113,7 @@ export const Days = ({
       ((day.isBooking && (day.isStartDate || day.isEndDate)) || !day.isBooking)
     ) {
       ajouterElementD(day.day);
+      test.push(day.day);
 
       if (dayjs(daysD[1]).diff(daysD[0]) < 0 && daysD.length === 2) {
         ajouterElementD(day.day);
