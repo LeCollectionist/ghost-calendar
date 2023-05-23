@@ -1,13 +1,21 @@
 import { memo } from "react";
 import { View, Image } from "react-native";
 
-import { DayType } from "../../core";
+import { BookingColorType, DayType } from "../../core";
 
 import { style, getTypeColor } from "./style";
 import { HalfDaySeparator } from "./HalfDaySeparator";
 
 export const CheckIn = memo(
-  ({ day, editMode }: { day: DayType; editMode?: boolean }) => {
+  ({
+    day,
+    editMode,
+    bookingColors,
+  }: {
+    day: DayType;
+    editMode?: boolean;
+    bookingColors?: BookingColorType;
+  }) => {
     if (day.bookingType) {
       return (
         <>
@@ -15,18 +23,28 @@ export const CheckIn = memo(
             <Image source={require("./optionLeft.png")} style={style.ach2} />
           )}
           {!editMode && (
-            <View style={getTypeColor(day.bookingType, true, false)} />
+            <View
+              style={getTypeColor(day.bookingType, true, false, bookingColors)}
+            />
           )}
         </>
       );
     }
 
-    return <View style={getTypeColor("owner", true, false)} />;
+    return <View style={getTypeColor("owner", true, false, bookingColors)} />;
   }
 );
 
 export const CheckOut = memo(
-  ({ day, editMode }: { day: DayType; editMode?: boolean }) => {
+  ({
+    day,
+    editMode,
+    bookingColors,
+  }: {
+    day: DayType;
+    editMode?: boolean;
+    bookingColors?: BookingColorType;
+  }) => {
     if (day.bookingType) {
       return (
         <>
@@ -34,13 +52,15 @@ export const CheckOut = memo(
             <Image source={require("./optionRight.png")} style={style.ach2} />
           )}
           {!editMode && (
-            <View style={getTypeColor(day.bookingType, false, true)} />
+            <View
+              style={getTypeColor(day.bookingType, false, true, bookingColors)}
+            />
           )}
         </>
       );
     }
 
-    return <View style={getTypeColor("owner", false, true)} />;
+    return <View style={getTypeColor("owner", false, true, bookingColors)} />;
   }
 );
 
@@ -48,10 +68,12 @@ export const CheckInCheckOut = ({
   tomorrow,
   yesterday,
   editMode,
+  bookingColors,
 }: {
   yesterday: DayType;
   tomorrow: DayType;
   editMode?: boolean;
+  bookingColors?: BookingColorType;
 }) => {
   if (yesterday.bookingType && tomorrow.bookingType) {
     return !editMode ? (
@@ -63,8 +85,17 @@ export const CheckInCheckOut = ({
           <Image source={require("./optionLeft.png")} style={style.ach2} />
         )}
         <HalfDaySeparator />
-        <View style={getTypeColor(yesterday.bookingType, false, true)} />
-        <View style={getTypeColor(tomorrow.bookingType, true, false)} />
+        <View
+          style={getTypeColor(
+            yesterday.bookingType,
+            false,
+            true,
+            bookingColors
+          )}
+        />
+        <View
+          style={getTypeColor(tomorrow.bookingType, true, false, bookingColors)}
+        />
       </>
     ) : null;
   }
@@ -77,9 +108,16 @@ export const CheckInCheckOut = ({
         )}
         <HalfDaySeparator />
         {!editMode && (
-          <View style={getTypeColor(tomorrow.bookingType, true, false)} />
+          <View
+            style={getTypeColor(
+              tomorrow.bookingType,
+              true,
+              false,
+              bookingColors
+            )}
+          />
         )}
-        <View style={getTypeColor("owner", false, true)} />
+        <View style={getTypeColor("owner", false, true, bookingColors)} />
       </>
     );
   }
@@ -92,9 +130,16 @@ export const CheckInCheckOut = ({
         )}
         <HalfDaySeparator />
         {!editMode && (
-          <View style={getTypeColor(yesterday.bookingType, false, true)} />
+          <View
+            style={getTypeColor(
+              yesterday.bookingType,
+              false,
+              true,
+              bookingColors
+            )}
+          />
         )}
-        <View style={getTypeColor("owner", true, false)} />
+        <View style={getTypeColor("owner", true, false, bookingColors)} />
       </>
     );
   }

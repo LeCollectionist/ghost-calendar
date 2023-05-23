@@ -1,6 +1,6 @@
 import { StyleSheet, StyleProp, ViewStyle } from "react-native";
 
-import { DayType } from "../../core";
+import { BookingColorType, DayType } from "../../core";
 import { communStyleType } from "./types";
 
 export const getCurrentDayColor = (day: DayType) => {
@@ -15,9 +15,15 @@ export const getCurrentDayColor = (day: DayType) => {
   return {};
 };
 
-const selectStyleManager = (day: DayType) => {
+const selectStyleManager = (day: DayType, bookingColors?: BookingColorType) => {
   if (day.isRangeDate) {
-    return style.ownerDayBooking;
+    return {
+      ...style.ownerDayBooking,
+      borderColor:
+        bookingColors?.owner?.beetween || style.ownerDayBooking.borderColor,
+      backgroundColor:
+        bookingColors?.owner?.beetween || style.ownerDayBooking.backgroundColor,
+    };
   }
 
   if (day.bookingType && !day.isStartDate && !day.isEndDate) {
@@ -27,7 +33,11 @@ const selectStyleManager = (day: DayType) => {
   return style.day;
 };
 
-export const styleSelector = (day: DayType, editMode?: boolean) => {
+export const styleSelector = (
+  day: DayType,
+  editMode?: boolean,
+  bookingColors?: BookingColorType
+) => {
   if (Object.keys(day).length === 0) {
     return style.day;
   }
@@ -37,10 +47,10 @@ export const styleSelector = (day: DayType, editMode?: boolean) => {
   }
 
   if (editMode && !day.isBooking) {
-    return selectStyleManager(day);
+    return selectStyleManager(day, bookingColors);
   }
 
-  return editMode ? style.day : selectStyleManager(day);
+  return editMode ? style.day : selectStyleManager(day, bookingColors);
 };
 
 const WIDTH = 50;
@@ -59,13 +69,17 @@ const communStyle: communStyleType = {
 export const getTypeColor = (
   type: "other" | "contract" | "option" | "owner",
   noLeftColor?: boolean,
-  noRightColor?: boolean
+  noRightColor?: boolean,
+  bookingColors?: BookingColorType
 ): StyleProp<ViewStyle> => {
   const theme = {
     other: { start: "#D9E8B0", end: "#D9E8B0" },
     contract: { start: "#E2D1B5", end: "#E9DDC8" },
     option: { start: "transparent", end: "transparent" },
-    owner: { start: "#B8DED7", end: "#B8DED7" },
+    owner: {
+      start: bookingColors?.owner?.startEnd || "#B8DED7",
+      end: bookingColors?.owner?.startEnd || "#B8DED7",
+    },
   };
 
   const MARGIN = 0;

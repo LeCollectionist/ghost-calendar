@@ -1,7 +1,7 @@
 import { memo } from "react";
 import dayjs from "dayjs";
 import { View, Text, Pressable, Image } from "react-native";
-import { CalendarVM, DayType } from "../../core";
+import { BookingColorType, CalendarVM, DayType } from "../../core";
 import * as Haptics from "expo-haptics";
 
 import {
@@ -34,6 +34,7 @@ export type DayComponentType = {
   rangeMarkerHandler?: (info: RangeType) => void;
   resetCalendar: () => void;
   calendar: CalendarVM;
+  bookingColors: BookingColorType;
 };
 
 type CheckMarkerType = {
@@ -41,16 +42,21 @@ type CheckMarkerType = {
   days: DayType[];
   index: number;
   editMode?: boolean;
+  bookingColors?: BookingColorType;
 };
 
 export const CheckMarker = memo(
-  ({ day, days, index, editMode }: CheckMarkerType) => {
+  ({ day, days, index, editMode, bookingColors }: CheckMarkerType) => {
     if (periodHasNotEnDate(day)) {
-      return <CheckIn day={day} editMode={editMode} />;
+      return (
+        <CheckIn day={day} editMode={editMode} bookingColors={bookingColors} />
+      );
     }
 
     if (periodHasNotStartDate(day)) {
-      return <CheckOut day={day} editMode={editMode} />;
+      return (
+        <CheckOut day={day} editMode={editMode} bookingColors={bookingColors} />
+      );
     }
 
     if (periodHasCompleted(day)) {
@@ -59,6 +65,7 @@ export const CheckMarker = memo(
           yesterday={getPreviousDay(days, index)}
           tomorrow={getNextDay(days, index)}
           editMode={editMode}
+          bookingColors={bookingColors}
         />
       );
     }
@@ -83,8 +90,6 @@ const ajouterElementD = (nouvelElement: string): void => {
   }
 };
 
-let test = [];
-
 export const Days = ({
   bookingDayHandler,
   days,
@@ -94,6 +99,7 @@ export const Days = ({
   rangeMarkerHandler,
   resetCalendar,
   calendar,
+  bookingColors,
 }: DayComponentType) => {
   const onPress = (day: DayType, calendar: CalendarVM) => {
     if (hasCompletedRange && day.day) {
@@ -113,7 +119,6 @@ export const Days = ({
       ((day.isBooking && (day.isStartDate || day.isEndDate)) || !day.isBooking)
     ) {
       ajouterElementD(day.day);
-      test.push(day.day);
 
       if (dayjs(daysD[1]).diff(daysD[0]) < 0 && daysD.length === 2) {
         ajouterElementD(day.day);
@@ -134,14 +139,20 @@ export const Days = ({
   const renderDays = days.map((day, idx) => {
     const isBookingOption =
       day.bookingType === "option" && !day.isStartDate && !day.isEndDate;
+
     return (
       <Pressable
         onPress={() => onPress(day, calendar)}
-        style={styleSelector(day)}
+        style={styleSelector(day, false, bookingColors)}
         key={`${day.day}${idx}`}
       >
         {day.isCurrentDay && <CurrentDayPointer />}
-        <CheckMarker day={day} days={days} index={idx} />
+        <CheckMarker
+          day={day}
+          days={days}
+          index={idx}
+          bookingColors={bookingColors}
+        />
         {isBookingOption && (
           <Image
             source={require("./optionFull.png")}

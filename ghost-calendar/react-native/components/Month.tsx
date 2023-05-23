@@ -1,5 +1,5 @@
 import { View, Text } from "react-native";
-import { CalendarVM, DayType, MonthType } from "../../core";
+import { BookingColorType, CalendarVM, DayType, MonthType } from "../../core";
 
 import { Days } from "./Days";
 import { EditModeDays } from "./EditModeDays";
@@ -17,6 +17,7 @@ export const Month = memo(
     rangeMarkerHandler,
     resetCalendar,
     calendar,
+    bookingColors,
   }: {
     month: MonthType;
     editMode: boolean;
@@ -27,6 +28,7 @@ export const Month = memo(
     rangeMarkerHandler?: (info: RangeType) => void;
     resetCalendar: () => void;
     calendar: CalendarVM;
+    bookingColors: BookingColorType;
   }) => (
     <>
       <View style={{ marginBottom: 10, marginTop: 0, paddingLeft: 19 }}>
@@ -49,6 +51,7 @@ export const Month = memo(
           setPeriod={setPeriod}
           resetCalendar={resetCalendar}
           calendar={calendar}
+          bookingColors={bookingColors}
         />
       ) : (
         <Days
@@ -60,6 +63,7 @@ export const Month = memo(
           rangeMarkerHandler={rangeMarkerHandler}
           resetCalendar={resetCalendar}
           calendar={calendar}
+          bookingColors={bookingColors}
         />
       )}
     </>

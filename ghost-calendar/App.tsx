@@ -23,7 +23,7 @@ const newCalendar = createCalendar({
   startDate: startDateCalendar,
   endDate: endDateCalendar,
   rangeDates: [],
-  visualMonth: 12,
+  visualMonth: 2,
   bookingColors: {},
   timezone: "Europe/Paris",
 });
@@ -48,16 +48,9 @@ function CalendarScreen() {
       <CalendarComponent
         withInteraction
         locale="fr"
-        bookingDayHandler={(booking) => {
-          console.log("booking", booking);
-        }}
         rangeMarkerHandler={(range) => {
-          console.log("range", range);
           if (range) setShowRange(range);
         }}
-        hasCompletedRange={(hasCompletedRange) =>
-          console.log("hasCompletedRange", hasCompletedRange)
-        }
         newCalendar={newCalendar}
       />
       {showRange && (
@@ -66,8 +59,7 @@ function CalendarScreen() {
             position: "absolute",
             width: "100%",
             height: 50,
-            backgroundColor: "#fff",
-            bottom: 0,
+            backgroundColor: "#00FF00",
           }}
         >
           <Button

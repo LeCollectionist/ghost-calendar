@@ -154,9 +154,13 @@ export class CalendarPresenter extends Presenter<CalendarVM> {
   displayInitializePeriod(months: MonthType[], calendarState: CalendarVM) {
     this.vm.checkIn = "";
     this.vm.checkOut = "";
-    this.vm.months = months;
+    this.vm.months = [];
     this.vm.visualMonth = calendarState.visualMonth;
     this.vm.rangeDates = calendarState.rangeDates;
+    this.displayCalendar({
+      period: { startDate: "", endDate: "" },
+      bookingColors: this.vm.bookingColors,
+    });
     this.notifyVM();
   }
 

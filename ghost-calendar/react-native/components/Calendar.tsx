@@ -80,6 +80,7 @@ const CalendarComponent = ({
               rangeMarkerHandler={rangeMarkerHandler}
               resetCalendar={resetCalendar}
               calendar={calendar}
+              bookingColors={newCalendar.presenter.vm.bookingColors}
             />
             {index === calendar.months.length - 1 && (
               <View style={{ marginBottom: 80 }} />
