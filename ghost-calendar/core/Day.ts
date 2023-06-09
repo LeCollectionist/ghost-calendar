@@ -6,6 +6,7 @@ import {
   BookingInfo,
   ContractInfo,
   OwnerInfo,
+  PeriodRules,
 } from "./helpers/types";
 import {
   checkCurrentDayAndPastDay,
@@ -114,6 +115,26 @@ export default class Day {
         this.day.isRangeDate = true;
     }
 
+    return this;
+  }
+
+  setPeriodRules(periodRules: PeriodRules[] | undefined) {
+    if (periodRules) {
+      periodRules.forEach((rule) => {
+        const isStartAt = rule.startAt === this.day.day;
+        const isBetween = checkBetweenDates(
+          rule.startAt,
+          rule.endAt,
+          this.day.day
+        );
+        const isEndAt = rule.endAt === this.day.day;
+
+        if (isStartAt || isBetween || isEndAt) {
+          this.day.minimunDuration = rule.minimumDuration;
+          this.day.periodType = rule.periodType;
+        }
+      });
+    }
     return this;
   }
 

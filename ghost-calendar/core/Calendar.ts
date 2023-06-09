@@ -4,6 +4,7 @@ import {
   BookingInfo,
   WorldTimezones,
   MonthType,
+  PeriodRules,
 } from "./helpers/types";
 import { notifyIfPeriodIsUncompleted } from "./helpers/notifiers";
 
@@ -20,8 +21,52 @@ export default class Calendar {
       visualMonth: number;
       bookingColors: BookingColorType;
       timezone?: WorldTimezones;
+      periodRules: PeriodRules[];
     }
   ) {}
+
+  private periodIsCompleted(
+    presenter: CalendarPresenter,
+    day: DayType,
+    calendarState: CalendarVM,
+    initialMonths: MonthType[]
+  ) {
+    const isUncompleted = Boolean(
+      calendarState.checkIn && !calendarState.checkOut
+    );
+    const date = day.day as string;
+
+    if (isUncompleted) {
+      notifyIfPeriodIsUncompleted(
+        presenter,
+        date,
+        calendarState.checkIn,
+        calendarState,
+        initialMonths,
+        this.props.timezone
+      );
+
+      return false;
+    }
+
+    return true;
+  }
+
+  private setStartDate(
+    presenter: CalendarPresenter,
+    day: DayType,
+    calendarState: CalendarVM,
+    initialMonths: MonthType[]
+  ) {
+    const date = day.day as string;
+    const isCompleted = Boolean(
+      calendarState.checkIn && calendarState.checkOut
+    );
+
+    if (isCompleted)
+      presenter.displayStartDate(date, initialMonths, calendarState);
+    else presenter.displayStartDate(date, calendarState.months, calendarState);
+  }
 
   setPeriod(
     presenter: CalendarPresenter,
@@ -29,35 +74,27 @@ export default class Calendar {
     calendarState: CalendarVM,
     initialMonths: MonthType[]
   ) {
-    const canBeStartDate = !day.isStartDate && !day.isBooking && !day.isPastDay;
-    const periodIsUncompleted =
-      calendarState.checkIn && !calendarState.checkOut;
-    const periodIsCompleted = calendarState.checkIn && calendarState.checkOut;
-    const isEndDateOrBookingMarker = day.isEndDate || day.isRangeDate;
-
-    const date = day.day as string;
-
-    if (
-      canBeStartDate ||
-      isEndDateOrBookingMarker ||
-      (day.isStartDate && calendarState.checkIn)
-    ) {
-      if (periodIsUncompleted) {
-        notifyIfPeriodIsUncompleted(
+    if (Object.keys(day).length > 0) {
+      const canBeStartDate =
+        !day.isStartDate && !day.isBooking && !day.isPastDay;
+      const isEndDateOrBookingMarker = day.isEndDate || day.isRangeDate;
+      if (
+        canBeStartDate ||
+        isEndDateOrBookingMarker ||
+        (day.isStartDate && calendarState.checkIn)
+      ) {
+        const isCompleted = this.periodIsCompleted(
           presenter,
-          date,
-          calendarState.checkIn,
+          day,
           calendarState,
-          initialMonths,
-          this.props.timezone
+          initialMonths
         );
-      } else if (periodIsCompleted) {
-        presenter.displayStartDate(date, initialMonths, calendarState);
+        if (isCompleted) {
+          this.setStartDate(presenter, day, calendarState, initialMonths);
+        }
       } else {
-        presenter.displayStartDate(date, calendarState.months, calendarState);
+        presenter.displayInitializePeriod(initialMonths, calendarState);
       }
-    } else {
-      presenter.displayInitializePeriod(initialMonths, calendarState);
     }
   }
 
@@ -91,6 +128,7 @@ export default class Calendar {
     this.setNbMonth(presenter);
 
     presenter.displayRangeDates(this.props.rangeDates);
+    presenter.displayPeriodRules(this.props.periodRules);
 
     presenter.displayCalendar({
       period: {},

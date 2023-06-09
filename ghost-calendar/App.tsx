@@ -1,15 +1,12 @@
 import { useEffect, useState } from "react";
-import { View, Button, Text } from "react-native";
-import { Provider } from "react-redux";
-import { NavigationContainer } from "@react-navigation/native";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { View, Button } from "react-native";
 
 import {
   CalendarComponent,
-  rangeDates,
+  periodRules,
   RangeType,
+  rangeDates,
 } from "./react-native/components";
-import { store } from "./react-native/store";
 import { createCalendar } from "./react-native/hooks/useCalendar";
 
 const fullYear = new Date().getFullYear();
@@ -22,19 +19,12 @@ const newCalendar = createCalendar({
   locale: "fr",
   startDate: startDateCalendar,
   endDate: endDateCalendar,
-  rangeDates: [],
+  rangeDates,
   visualMonth: 2,
   bookingColors: {},
   timezone: "Europe/Paris",
+  periodRules,
 });
-
-function HomeScreen() {
-  return (
-    <View>
-      <Text>Home</Text>
-    </View>
-  );
-}
 
 function CalendarScreen() {
   const [showRange, setShowRange] = useState<RangeType | null>(null);
@@ -48,10 +38,9 @@ function CalendarScreen() {
       <CalendarComponent
         withInteraction
         locale="fr"
-        rangeMarkerHandler={(range) => {
-          if (range) setShowRange(range);
-        }}
+        rangeMarkerHandler={(range) => range && setShowRange(range)}
         newCalendar={newCalendar}
+        periodIsValid={(isValid) => console.log(isValid)}
       />
       {showRange && (
         <View
@@ -59,6 +48,7 @@ function CalendarScreen() {
             position: "absolute",
             width: "100%",
             height: 50,
+            bottom: 0,
             backgroundColor: "#00FF00",
           }}
         >
@@ -75,17 +65,6 @@ function CalendarScreen() {
   );
 }
 
-const Tab = createBottomTabNavigator();
-
 export default function App() {
-  return (
-    <Provider store={store}>
-      <NavigationContainer>
-        <Tab.Navigator>
-          <Tab.Screen name="Home" component={HomeScreen} />
-          <Tab.Screen name="Calendar" component={CalendarScreen} />
-        </Tab.Navigator>
-      </NavigationContainer>
-    </Provider>
-  );
+  return <CalendarScreen />;
 }

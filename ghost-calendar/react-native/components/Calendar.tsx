@@ -3,11 +3,8 @@ import {
   BookingColorType,
   Calendar,
   CalendarPresenter,
-  CalendarVM,
   DayType,
   LocaleType,
-  Period,
-  WorldTimezones,
 } from "../../core";
 
 import { useCalendar } from "../hooks/useCalendar";
@@ -15,12 +12,12 @@ import { useCalendar } from "../hooks/useCalendar";
 import { RangeType } from "./types";
 import { Month } from "./Month";
 import { Week } from "./Week";
-import { useEffect } from "react";
+import { useState } from "react";
+import { PeriodInfo } from "./periodInfo";
 
 type CalendarComponentType = {
   bookingColors?: BookingColorType;
   bookingDayHandler?: (day: DayType) => void;
-  editMode?: boolean;
   rangeMarkerHandler?: (info: RangeType) => void;
   withInteraction?: boolean;
   hasCompletedRange?: (hasCompletedRange: boolean) => void;
@@ -29,17 +26,21 @@ type CalendarComponentType = {
     presenter: CalendarPresenter;
   };
   locale: LocaleType;
+  periodIsValid?: (isValid: boolean) => void;
 };
 
 const CalendarComponent = ({
   bookingDayHandler,
-  editMode = false,
   rangeMarkerHandler,
   withInteraction = false,
   hasCompletedRange,
   newCalendar,
   locale,
+  periodIsValid,
 }: CalendarComponentType) => {
+  const [isValid, setPeriodIsValid] = useState(true);
+  const [daysSelected, setDaysSelected] = useState<DayType[]>([]);
+  const [nextDay, setNextDay] = useState<DayType | null>(null);
   const { calendar, setPeriod, resetCalendar } = useCalendar({
     newCalendar,
   });
@@ -59,10 +60,15 @@ const CalendarComponent = ({
       }}
     >
       <Week locale={locale} />
+      {!isValid && (
+        <PeriodInfo
+          locale={locale}
+          daysSelected={daysSelected}
+          nextDay={nextDay}
+        />
+      )}
       <FlatList
-        contentContainerStyle={{
-          paddingHorizontal: 12,
-        }}
+        contentContainerStyle={{ paddingHorizontal: 12 }}
         initialNumToRender={5}
         showsVerticalScrollIndicator={false}
         data={calendar.months}
@@ -72,7 +78,6 @@ const CalendarComponent = ({
             {index === 0 && <View style={{ marginTop: 20 }} />}
             <Month
               month={month}
-              editMode={editMode}
               bookingDayHandler={bookingDayHandler}
               setPeriod={setPeriod}
               withInteraction={withInteraction}
@@ -81,6 +86,11 @@ const CalendarComponent = ({
               resetCalendar={resetCalendar}
               calendar={calendar}
               bookingColors={newCalendar.presenter.vm.bookingColors}
+              periodIsValid={periodIsValid}
+              setPeriodIsValid={setPeriodIsValid}
+              setDaysSelected={setDaysSelected}
+              setNextDay={setNextDay}
+              daysSelected={daysSelected}
             />
             {index === calendar.months.length - 1 && (
               <View style={{ marginBottom: 80 }} />

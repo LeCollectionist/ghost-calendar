@@ -8,6 +8,7 @@ import {
   DayType,
   LocaleType,
   Period,
+  PeriodRules,
   WorldTimezones,
 } from "../../core";
 
@@ -21,6 +22,7 @@ type CalendarProps = {
   visualMonth: number;
   bookingColors: BookingColorType;
   timezone?: WorldTimezones;
+  periodRules: PeriodRules[];
 };
 
 export const createCalendar = ({
@@ -33,6 +35,7 @@ export const createCalendar = ({
   visualMonth,
   bookingColors,
   timezone,
+  periodRules,
 }: CalendarProps) => ({
   calendar: new Calendar({
     startDate,
@@ -43,6 +46,7 @@ export const createCalendar = ({
     visualMonth,
     bookingColors,
     timezone,
+    periodRules,
   }),
   presenter: new CalendarPresenter(locale, startDate, timezone),
 });

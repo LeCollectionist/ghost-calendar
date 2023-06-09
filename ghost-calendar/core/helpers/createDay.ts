@@ -1,7 +1,18 @@
 import Day from "../Day";
 import { dateHandler, isDatePassed } from "./date";
-import { BookingColorType, Period, WorldTimezones } from "./types";
+import { BookingColorType, Period, PeriodRules, WorldTimezones } from "./types";
 import { DateType } from "./utils";
+
+type CreateDayType = {
+  day: DateType;
+  period?: Period;
+  rangeDates?: Required<Period>[];
+  checkIn?: Date;
+  checkOut?: Date;
+  bookingColors?: BookingColorType;
+  timezone?: WorldTimezones;
+  periodRules?: PeriodRules[];
+};
 
 const excludePastDate = (
   rangeDates: Required<Period>[],
@@ -23,15 +34,7 @@ const excludePastDate = (
   return range;
 };
 
-export const createDay = (props: {
-  day: DateType;
-  period?: Period;
-  rangeDates?: Required<Period>[];
-  checkIn?: Date;
-  checkOut?: Date;
-  bookingColors?: BookingColorType;
-  timezone?: WorldTimezones;
-}) => {
+export const createDay = (props: CreateDayType) => {
   const currentDate = dateHandler({ timezone: props.timezone });
 
   const day = new Day(props.day)
@@ -46,7 +49,8 @@ export const createDay = (props: {
     .isEndDate(props.period?.endDate)
     .setRangeDate(props.period, props.checkIn, props.checkOut)
     .isCheckInCheckOut(props.checkIn, props.checkOut)
-    .isHalfDay();
+    .isHalfDay()
+    .setPeriodRules(props.periodRules);
 
   return day.build();
 };

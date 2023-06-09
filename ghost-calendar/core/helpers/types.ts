@@ -1,3 +1,5 @@
+import { DayRuleType } from "./periodRules";
+
 export type TypeBookingFormatted = "other" | "owner" | "option" | "contract";
 
 export type TypeBooking =
@@ -36,6 +38,8 @@ export type DayType = {
   ownerUploadYousignFileToken?: string | null;
   period?: { checkIn: string; checkOut: string };
   privateNote?: string;
+  minimunDuration?: number;
+  periodType?: DayRuleType;
 };
 
 export type MonthType = {
@@ -48,6 +52,16 @@ export type MonthType = {
 };
 
 export type Period = {
+  startDate?: string | undefined;
+  endDate?: string | undefined;
+  type?: TypeBookingFormatted | undefined;
+  checkInTime?: number;
+  checkOutTime?: number;
+  id?: string;
+  otherType?: TypeBooking;
+};
+
+export type PeriodInquery = {
   startDate?: string | undefined;
   endDate?: string | undefined;
   type?: TypeBookingFormatted | undefined;
@@ -78,6 +92,13 @@ export type LocaleType = "fr" | "en" | undefined;
 
 export type BookingColorType = {
   [key: string]: { startEnd: string; beetween: string };
+};
+
+export type PeriodRules = {
+  startAt: string;
+  endAt: string;
+  periodType: DayRuleType;
+  minimumDuration: number;
 };
 
 export type WorldTimezones =

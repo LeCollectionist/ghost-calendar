@@ -11,27 +11,39 @@ export const CheckIn = memo(
     day,
     editMode,
     bookingColors,
+    periodColor,
   }: {
     day: DayType;
     editMode?: boolean;
     bookingColors?: BookingColorType;
+    periodColor?: boolean;
   }) => {
     if (day.bookingType) {
       return (
         <>
-          {day.bookingType === "option" && !editMode && (
+          {day.bookingType === "option" && !editMode && !periodColor && (
             <Image source={require("./optionLeft.png")} style={style.ach2} />
           )}
           {!editMode && (
             <View
-              style={getTypeColor(day.bookingType, true, false, bookingColors)}
+              style={getTypeColor(
+                day.bookingType,
+                true,
+                false,
+                bookingColors,
+                periodColor
+              )}
             />
           )}
         </>
       );
     }
 
-    return <View style={getTypeColor("owner", true, false, bookingColors)} />;
+    return (
+      <View
+        style={getTypeColor("owner", true, false, bookingColors, periodColor)}
+      />
+    );
   }
 );
 
@@ -40,27 +52,39 @@ export const CheckOut = memo(
     day,
     editMode,
     bookingColors,
+    periodColor,
   }: {
     day: DayType;
     editMode?: boolean;
     bookingColors?: BookingColorType;
+    periodColor?: boolean;
   }) => {
     if (day.bookingType) {
       return (
         <>
-          {day.bookingType === "option" && !editMode && (
+          {day.bookingType === "option" && !editMode && !periodColor && (
             <Image source={require("./optionRight.png")} style={style.ach2} />
           )}
           {!editMode && (
             <View
-              style={getTypeColor(day.bookingType, false, true, bookingColors)}
+              style={getTypeColor(
+                day.bookingType,
+                false,
+                true,
+                bookingColors,
+                periodColor
+              )}
             />
           )}
         </>
       );
     }
 
-    return <View style={getTypeColor("owner", false, true, bookingColors)} />;
+    return (
+      <View
+        style={getTypeColor("owner", false, true, bookingColors, periodColor)}
+      />
+    );
   }
 );
 
@@ -69,19 +93,21 @@ export const CheckInCheckOut = ({
   yesterday,
   editMode,
   bookingColors,
+  periodColor,
 }: {
   yesterday: DayType;
   tomorrow: DayType;
   editMode?: boolean;
   bookingColors?: BookingColorType;
+  periodColor?: boolean;
 }) => {
   if (yesterday.bookingType && tomorrow.bookingType) {
     return !editMode ? (
       <>
-        {yesterday.bookingType === "option" && (
+        {yesterday.bookingType === "option" && !periodColor && (
           <Image source={require("./optionRight.png")} style={style.ach2} />
         )}
-        {tomorrow.bookingType === "option" && (
+        {tomorrow.bookingType === "option" && !periodColor && (
           <Image source={require("./optionLeft.png")} style={style.ach2} />
         )}
         <HalfDaySeparator />
@@ -90,11 +116,18 @@ export const CheckInCheckOut = ({
             yesterday.bookingType,
             false,
             true,
-            bookingColors
+            bookingColors,
+            periodColor
           )}
         />
         <View
-          style={getTypeColor(tomorrow.bookingType, true, false, bookingColors)}
+          style={getTypeColor(
+            tomorrow.bookingType,
+            true,
+            false,
+            bookingColors,
+            periodColor
+          )}
         />
       </>
     ) : null;
@@ -103,7 +136,7 @@ export const CheckInCheckOut = ({
   if (!yesterday.bookingType && tomorrow.bookingType) {
     return (
       <>
-        {tomorrow.bookingType === "option" && !editMode && (
+        {tomorrow.bookingType === "option" && !editMode && !periodColor && (
           <Image source={require("./optionLeft.png")} style={style.ach2} />
         )}
         <HalfDaySeparator />
@@ -113,11 +146,14 @@ export const CheckInCheckOut = ({
               tomorrow.bookingType,
               true,
               false,
-              bookingColors
+              bookingColors,
+              periodColor
             )}
           />
         )}
-        <View style={getTypeColor("owner", false, true, bookingColors)} />
+        <View
+          style={getTypeColor("owner", false, true, bookingColors, periodColor)}
+        />
       </>
     );
   }
@@ -125,7 +161,7 @@ export const CheckInCheckOut = ({
   if (yesterday.bookingType && !tomorrow.bookingType) {
     return (
       <>
-        {yesterday.bookingType === "option" && !editMode && (
+        {yesterday.bookingType === "option" && !editMode && !periodColor && (
           <Image source={require("./optionRight.png")} style={style.ach2} />
         )}
         <HalfDaySeparator />
@@ -135,11 +171,14 @@ export const CheckInCheckOut = ({
               yesterday.bookingType,
               false,
               true,
-              bookingColors
+              bookingColors,
+              periodColor
             )}
           />
         )}
-        <View style={getTypeColor("owner", true, false, bookingColors)} />
+        <View
+          style={getTypeColor("owner", true, false, bookingColors, periodColor)}
+        />
       </>
     );
   }

@@ -1,8 +1,6 @@
 import { memo } from "react";
-import dayjs from "dayjs";
 import { View, Text, Pressable, Image } from "react-native";
 import { BookingColorType, CalendarVM, DayType } from "../../core";
-import * as Haptics from "expo-haptics";
 
 import {
   getNextDay,
@@ -20,10 +18,7 @@ import {
 import { CurrentDayPointer } from "./CurrentDayPointer";
 import { CheckIn, CheckOut, CheckInCheckOut } from "./PeriodDelimiter";
 import { RangeType } from "./types";
-import { getBookingDateUi } from "../../core/helpers/utils";
-
-let daysT: string[] = [];
-let daysD: string[] = [];
+import { onPressHandler } from "./helpers/onPressHelper";
 
 export type DayComponentType = {
   bookingDayHandler?: (day: DayType) => void;
@@ -35,6 +30,10 @@ export type DayComponentType = {
   resetCalendar: () => void;
   calendar: CalendarVM;
   bookingColors: BookingColorType;
+  periodIsValid?: (isValid: boolean) => void;
+  setPeriodIsValid: (isValid: boolean) => void;
+  setDaysSelected: (day: DayType[]) => void;
+  setNextDay: (day: DayType) => void;
 };
 
 type CheckMarkerType = {
@@ -43,19 +42,37 @@ type CheckMarkerType = {
   index: number;
   editMode?: boolean;
   bookingColors?: BookingColorType;
+  periodColor?: boolean;
 };
 
 export const CheckMarker = memo(
-  ({ day, days, index, editMode, bookingColors }: CheckMarkerType) => {
+  ({
+    day,
+    days,
+    index,
+    editMode,
+    bookingColors,
+    periodColor,
+  }: CheckMarkerType) => {
     if (periodHasNotEnDate(day)) {
       return (
-        <CheckIn day={day} editMode={editMode} bookingColors={bookingColors} />
+        <CheckIn
+          day={day}
+          editMode={editMode}
+          bookingColors={bookingColors}
+          periodColor={periodColor}
+        />
       );
     }
 
     if (periodHasNotStartDate(day)) {
       return (
-        <CheckOut day={day} editMode={editMode} bookingColors={bookingColors} />
+        <CheckOut
+          day={day}
+          editMode={editMode}
+          bookingColors={bookingColors}
+          periodColor={periodColor}
+        />
       );
     }
 
@@ -66,6 +83,7 @@ export const CheckMarker = memo(
           tomorrow={getNextDay(days, index)}
           editMode={editMode}
           bookingColors={bookingColors}
+          periodColor={periodColor}
         />
       );
     }
@@ -73,22 +91,6 @@ export const CheckMarker = memo(
     return null;
   }
 );
-
-const ajouterElement = (nouvelElement: string): void => {
-  if (daysT.length < 2) {
-    daysT.push(nouvelElement);
-  } else {
-    daysT.splice(0, 2, nouvelElement);
-  }
-};
-
-const ajouterElementD = (nouvelElement: string): void => {
-  if (daysD.length < 2) {
-    daysD.push(nouvelElement);
-  } else {
-    daysD.splice(0, 2, nouvelElement);
-  }
-};
 
 export const Days = ({
   bookingDayHandler,
@@ -100,50 +102,43 @@ export const Days = ({
   resetCalendar,
   calendar,
   bookingColors,
-}: DayComponentType) => {
-  const onPress = (day: DayType, calendar: CalendarVM) => {
-    if (hasCompletedRange && day.day) {
-      ajouterElement(day.day);
-      hasCompletedRange(daysT.length === 2);
-    }
-    if (day.isBooking && bookingDayHandler) bookingDayHandler(day);
-
-    if (withInteraction) {
-      setPeriod(day);
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    }
-
-    if (
-      rangeMarkerHandler &&
-      day.day &&
-      ((day.isBooking && (day.isStartDate || day.isEndDate)) || !day.isBooking)
-    ) {
-      ajouterElementD(day.day);
-
-      if (dayjs(daysD[1]).diff(daysD[0]) < 0 && daysD.length === 2) {
-        ajouterElementD(day.day);
-      }
-
-      if (getBookingDateUi(calendar, daysD[0], daysD[1]).length > 0) {
-        ajouterElementD(day.day);
-      }
-
-      rangeMarkerHandler({
-        startDate: daysD[0] || "",
-        endDate: daysD[1] || "",
-        resetCalendar: () => resetCalendar(),
-      });
-    }
-  };
-
+  periodIsValid,
+  setPeriodIsValid,
+  setDaysSelected,
+  setNextDay,
+  daysSelected,
+}: DayComponentType & { daysSelected: DayType[] }) => {
   const renderDays = days.map((day, idx) => {
     const isBookingOption =
       day.bookingType === "option" && !day.isStartDate && !day.isEndDate;
 
+    const nextDay = days[idx + 1];
+
+    const condition = !day.isSelectedDate || daysSelected.length === 2;
+
     return (
       <Pressable
-        onPress={() => onPress(day, calendar)}
-        style={styleSelector(day, false, bookingColors)}
+        onPress={() => {
+          if (!day.isPastDay && Object.keys(day).length !== 0 && condition) {
+            setNextDay(nextDay);
+            onPressHandler({
+              bookingDayHandler,
+              days,
+              setPeriod,
+              withInteraction,
+              hasCompletedRange,
+              rangeMarkerHandler,
+              resetCalendar,
+              calendar,
+              bookingColors,
+              day,
+              periodIsValid,
+              setPeriodIsValid,
+              setDaysSelected,
+            });
+          }
+        }}
+        style={styleSelector(day, false, bookingColors, Boolean(periodIsValid))}
         key={`${day.day}${idx}`}
       >
         {day.isCurrentDay && <CurrentDayPointer />}
@@ -152,8 +147,9 @@ export const Days = ({
           days={days}
           index={idx}
           bookingColors={bookingColors}
+          periodColor={Boolean(periodIsValid)}
         />
-        {isBookingOption && (
+        {isBookingOption && !Boolean(periodIsValid) && (
           <Image
             source={require("./optionFull.png")}
             style={calendarStyle.ach}

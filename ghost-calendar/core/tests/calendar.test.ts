@@ -1,205 +1,191 @@
-import Calendar from "../Calendar";
-import { CalendarPresenter } from "../CalendarPresenter";
-import { Period } from "../helpers/types";
+import { createCalendar } from "../../react-native/hooks/useCalendar";
 
-const Periods: Required<Period>[] = [
-  {
-    startDate: "2022-06-01",
-    endDate: "2022-06-07",
-    type: "other",
-    checkInTime: 17,
-    checkOutTime: 10,
-  },
-];
+const fullYear = new Date("2022-06-05").getFullYear();
+const month = new Date("2022-06-05").getMonth();
+
+const startDateCalendar = new Date(fullYear, month, 1);
+const endDateCalendar = new Date(fullYear + 1, month + 2, 1);
+
+const { presenter, calendar } = createCalendar({
+  locale: "fr",
+  startDate: startDateCalendar,
+  endDate: endDateCalendar,
+  rangeDates: [
+    {
+      startDate: "2022-06-15",
+      endDate: "2022-06-17",
+      type: "other",
+      checkInTime: 17,
+      checkOutTime: 10,
+      id: "3",
+      otherType: "Bookings::Admin",
+    },
+    {
+      startDate: "2022-06-25",
+      endDate: "2022-06-30",
+      type: "other",
+      checkInTime: 17,
+      checkOutTime: 10,
+      id: "4",
+      otherType: "Bookings::Admin",
+    },
+  ],
+  visualMonth: 1,
+  bookingColors: {},
+  timezone: "Europe/Paris",
+  periodRules: [],
+});
+
+const initialMonths = [...presenter.vm.months];
+const calendarState = presenter.vm;
+
+calendar.build(presenter);
 
 describe("Calendar", () => {
-  const presenter = new CalendarPresenter();
-  const calendar = new Calendar(12, Periods);
-  calendar.build(presenter);
+  it("Should create new calendar", () => {
+    //Then
+    presenter.vm.months.map((month) => {
+      expect(month.id).toBe("5-2022");
+      expect(month.days.length).toBe(42);
+      expect(month.index).toBe(0);
+      expect(month.monthKey).toBe(5);
+      expect(month.monthName).toBe("juin 2022");
+    });
+  });
 
-  const presenterB = new CalendarPresenter();
-  const calendarB = new Calendar(12, Periods);
-  calendarB.build(presenterB);
-
-  const presenterC = new CalendarPresenter();
-  const calendarC = new Calendar(12, Periods);
-  calendarC.build(presenterC);
-
-  const presenterD = new CalendarPresenter();
-  const calendarD = new Calendar(12, Periods);
-  calendarD.build(presenterD);
-
-  const presenterE = new CalendarPresenter();
-  const calendarE = new Calendar(12, Periods);
-  calendarE.build(presenterE);
-
-  test("Should not return start date if selected day is start date", () => {
-    calendar.setPeriod(
-      presenter,
-      {
-        day: "2022-11-22",
-        dayNumber: "22",
-        isCurrentDay: false,
+  it("Should set a period", () => {
+    //Given
+    const startDate = { day: "2022-06-06" };
+    const endDate = { day: "2022-06-10" };
+    //When
+    calendar.setPeriod(presenter, startDate, calendarState, initialMonths);
+    calendar.setPeriod(presenter, endDate, calendarState, initialMonths);
+    //Then
+    presenter.vm.months.map((month) => {
+      const findStartDay = month.days.find((day) => day.day === "2022-06-06");
+      const findEndDay = month.days.find((day) => day.day === "2022-06-10");
+      const findBetweenDay = month.days.find((day) => day.day === "2022-06-08");
+      expect(findStartDay).toEqual({
+        day: "2022-06-06",
+        dayNumber: "6",
+        isSelectedDate: true,
         isStartDate: true,
-        isBooking: true,
-      },
-      "",
-      ""
-    );
-
-    presenter.subscribeVM((vm) => {
-      expect(vm.checkIn).toBe("");
-    });
-  });
-
-  test("Should not return start date if selected day is booking date", () => {
-    calendar.setPeriod(
-      presenter,
-      {
-        day: "2022-11-22",
-        dayNumber: "22",
-        isCurrentDay: false,
-        isBooking: true,
-      },
-      "",
-      ""
-    );
-
-    presenter.subscribeVM((vm) => {
-      expect(vm.checkIn).toBe("");
-    });
-  });
-
-  test("Should not return start date if selected day is a disable date", () => {
-    calendar.setPeriod(
-      presenter,
-      {
-        day: "2022-11-22",
-        dayNumber: "22",
-        isCurrentDay: false,
         isPastDay: true,
-      },
-      "",
-      ""
-    );
-
-    presenter.subscribeVM((vm) => {
-      expect(vm.checkIn).toBe("");
-    });
-  });
-
-  test("Should return start date if selected day is a end date", () => {
-    const presenterT = new CalendarPresenter();
-    const calendarT = new Calendar(12, Periods);
-
-    calendarT.build(presenterT);
-
-    calendarT.setPeriod(
-      presenterT,
-      {
-        day: "2022-11-22",
-        dayNumber: "22",
-        isCurrentDay: false,
-        isBooking: true,
+      });
+      expect(findEndDay).toEqual({
+        day: "2022-06-10",
+        dayNumber: "10",
+        isSelectedDate: true,
         isEndDate: true,
-      },
-      "",
-      ""
-    );
-
-    presenterT.subscribeVM((vm) => {
-      expect(vm.checkIn).toBe("2022-11-22");
+        isPastDay: true,
+      });
+      expect(findBetweenDay).toEqual({
+        day: "2022-06-08",
+        dayNumber: "8",
+        isRangeDate: true,
+        isPastDay: true,
+      });
     });
   });
 
-  test("Should change start date if selected day is a past date", () => {
-    presenterB.displayStartDate("2022-11-22");
-
-    calendarB.setPeriod(
-      presenterB,
-      {
-        day: "2022-11-21",
-        dayNumber: "21",
-        isCurrentDay: false,
-      },
-      "2022-11-22",
-      ""
-    );
-
-    presenterB.subscribeVM((vm) => {
-      expect(vm.checkIn).toBe("2022-11-21");
+  it("Should clear period selection", () => {
+    //Given
+    const startDate = { day: "2022-06-06" };
+    const endDate = { day: "2022-06-10" };
+    //When
+    calendar.setPeriod(presenter, startDate, calendarState, initialMonths);
+    calendar.setPeriod(presenter, endDate, calendarState, initialMonths);
+    calendar.clearCalendar(presenter, calendarState, initialMonths);
+    //Then
+    presenter.vm.months.map((month) => {
+      const findStartDay = month.days.find((day) => day.day === "2022-06-06");
+      const findEndDay = month.days.find((day) => day.day === "2022-06-10");
+      const findBetweenDay = month.days.find((day) => day.day === "2022-06-08");
+      expect(findStartDay).toEqual({
+        day: "2022-06-06",
+        isPastDay: true,
+        dayNumber: "6",
+      });
+      expect(findEndDay).toEqual({
+        day: "2022-06-10",
+        dayNumber: "10",
+        isPastDay: true,
+      });
+      expect(findBetweenDay).toEqual({
+        day: "2022-06-08",
+        dayNumber: "8",
+        isPastDay: true,
+      });
     });
   });
 
-  test("Should not change start date if selected day is a future date", () => {
-    presenterC.displayStartDate("2022-11-22");
-
-    calendarC.setPeriod(
-      presenterC,
-      {
-        day: "2022-11-24",
-        dayNumber: "21",
-        isCurrentDay: false,
-      },
-      "2022-11-22",
-      ""
-    );
-
-    presenterC.subscribeVM((vm) => {
-      expect(vm.checkIn).toBe("2022-11-22");
+  it("Should set a period with range dates", () => {
+    //Given
+    const startDate = { day: "2022-06-17" };
+    const endDate = { day: "2022-06-19" };
+    //When
+    calendar.setPeriod(presenter, startDate, calendarState, initialMonths);
+    calendar.setPeriod(presenter, endDate, calendarState, initialMonths);
+    //Then
+    presenter.vm.months.map((month) => {
+      const findStartDay = month.days.find((day) => day.day === "2022-06-17");
+      const findEndDay = month.days.find((day) => day.day === "2022-06-19");
+      const findBetweenDay = month.days.find((day) => day.day === "2022-06-18");
+      expect(findStartDay).toEqual({
+        day: "2022-06-17",
+        dayNumber: "17",
+        isSelectedDate: true,
+        isStartDate: true,
+        isPastDay: true,
+      });
+      expect(findEndDay).toEqual({
+        day: "2022-06-19",
+        dayNumber: "19",
+        isSelectedDate: true,
+        isEndDate: true,
+        isPastDay: true,
+      });
+      expect(findBetweenDay).toEqual({
+        day: "2022-06-18",
+        dayNumber: "18",
+        isRangeDate: true,
+        isPastDay: true,
+      });
     });
   });
 
-  test("Should return end date if selected day is a future date", () => {
-    presenterD.displayStartDate("2022-11-22");
-
-    calendarD.setPeriod(
-      presenterD,
-      {
-        day: "2022-11-24",
-        dayNumber: "21",
-        isCurrentDay: false,
-      },
-      "2022-11-22",
-      ""
-    );
-
-    presenterD.subscribeVM((vm) => {
-      expect(vm.checkIn).toBe("2022-11-22");
-      expect(vm.checkOut).toBe("2022-11-24");
-    });
-  });
-
-  test("Should notify if start day and end day is completed", () => {
-    presenterE.displayStartDate("2022-11-22");
-
-    calendarE.setPeriod(
-      presenterE,
-      {
-        day: "2022-11-22",
-        dayNumber: "21",
-        isCurrentDay: false,
-      },
-      "2022-11-22",
-      ""
-    );
-
-    presenterE.displayEndDate("2022-11-24", "2022-11-22");
-
-    calendarE.setPeriod(
-      presenterE,
-      {
-        day: "2022-11-24",
-        dayNumber: "21",
-        isCurrentDay: false,
-      },
-      "2022-11-22",
-      "2022-11-24"
-    );
-
-    presenterE.subscribeVM((vm) => {
-      expect(vm.checkIn).toBe("2022-11-24");
-      expect(vm.checkOut).toBe("2022-11-24");
+  it("Should set a period with range dates", () => {
+    //Given
+    const startDate = { day: "2022-06-20" };
+    const endDate = { day: "2022-06-25" };
+    //When
+    calendar.setPeriod(presenter, startDate, calendarState, initialMonths);
+    calendar.setPeriod(presenter, endDate, calendarState, initialMonths);
+    //Then
+    presenter.vm.months.map((month) => {
+      const findStartDay = month.days.find((day) => day.day === "2022-06-20");
+      const findEndDay = month.days.find((day) => day.day === "2022-06-25");
+      const findBetweenDay = month.days.find((day) => day.day === "2022-06-22");
+      expect(findStartDay).toEqual({
+        day: "2022-06-20",
+        dayNumber: "20",
+        isSelectedDate: true,
+        isPastDay: true,
+        isStartDate: true,
+      });
+      expect(findEndDay).toEqual({
+        day: "2022-06-25",
+        dayNumber: "25",
+        isSelectedDate: true,
+        isEndDate: true,
+        isPastDay: true,
+      });
+      expect(findBetweenDay).toEqual({
+        day: "2022-06-22",
+        dayNumber: "22",
+        isRangeDate: true,
+        isPastDay: true,
+      });
     });
   });
 });

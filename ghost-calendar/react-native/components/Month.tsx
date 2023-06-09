@@ -1,15 +1,30 @@
 import { View, Text } from "react-native";
+import { memo } from "react";
 import { BookingColorType, CalendarVM, DayType, MonthType } from "../../core";
 
 import { Days } from "./Days";
-import { EditModeDays } from "./EditModeDays";
-import { memo } from "react";
 import { RangeType } from "./types";
+
+type MonthComponentType = {
+  month: MonthType;
+  bookingDayHandler?: (day: DayType) => void;
+  setPeriod: (day: DayType) => void;
+  withInteraction: boolean;
+  hasCompletedRange?: (hasCompletedRange: boolean) => void;
+  rangeMarkerHandler?: (info: RangeType) => void;
+  resetCalendar: () => void;
+  calendar: CalendarVM;
+  bookingColors: BookingColorType;
+  periodIsValid?: (isValid: boolean) => void;
+  setPeriodIsValid: (isValid: boolean) => void;
+  setDaysSelected: (day: DayType[]) => void;
+  setNextDay: (day: DayType) => void;
+  daysSelected: DayType[];
+};
 
 export const Month = memo(
   ({
     month,
-    editMode,
     bookingDayHandler,
     setPeriod,
     withInteraction,
@@ -18,18 +33,12 @@ export const Month = memo(
     resetCalendar,
     calendar,
     bookingColors,
-  }: {
-    month: MonthType;
-    editMode: boolean;
-    bookingDayHandler?: (day: DayType) => void;
-    setPeriod: (day: DayType) => void;
-    withInteraction: boolean;
-    hasCompletedRange?: (hasCompletedRange: boolean) => void;
-    rangeMarkerHandler?: (info: RangeType) => void;
-    resetCalendar: () => void;
-    calendar: CalendarVM;
-    bookingColors: BookingColorType;
-  }) => (
+    periodIsValid,
+    setPeriodIsValid,
+    setDaysSelected,
+    setNextDay,
+    daysSelected,
+  }: MonthComponentType) => (
     <>
       <View style={{ marginBottom: 10, marginTop: 0, paddingLeft: 19 }}>
         <Text
@@ -44,28 +53,22 @@ export const Month = memo(
           {month.monthName}
         </Text>
       </View>
-      {editMode ? (
-        <EditModeDays
-          bookingDayHandler={bookingDayHandler}
-          days={month.days}
-          setPeriod={setPeriod}
-          resetCalendar={resetCalendar}
-          calendar={calendar}
-          bookingColors={bookingColors}
-        />
-      ) : (
-        <Days
-          bookingDayHandler={bookingDayHandler}
-          days={month.days}
-          setPeriod={setPeriod}
-          withInteraction={withInteraction}
-          hasCompletedRange={hasCompletedRange}
-          rangeMarkerHandler={rangeMarkerHandler}
-          resetCalendar={resetCalendar}
-          calendar={calendar}
-          bookingColors={bookingColors}
-        />
-      )}
+      <Days
+        bookingDayHandler={bookingDayHandler}
+        days={month.days}
+        setPeriod={setPeriod}
+        withInteraction={withInteraction}
+        hasCompletedRange={hasCompletedRange}
+        rangeMarkerHandler={rangeMarkerHandler}
+        resetCalendar={resetCalendar}
+        calendar={calendar}
+        bookingColors={bookingColors}
+        periodIsValid={periodIsValid}
+        setPeriodIsValid={setPeriodIsValid}
+        setDaysSelected={setDaysSelected}
+        setNextDay={setNextDay}
+        daysSelected={daysSelected}
+      />
     </>
   )
 );

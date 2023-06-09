@@ -15,7 +15,11 @@ export const getCurrentDayColor = (day: DayType) => {
   return {};
 };
 
-const selectStyleManager = (day: DayType, bookingColors?: BookingColorType) => {
+const selectStyleManager = (
+  day: DayType,
+  bookingColors?: BookingColorType,
+  periodColor?: boolean
+) => {
   if (day.isRangeDate) {
     return {
       ...style.ownerDayBooking,
@@ -27,7 +31,9 @@ const selectStyleManager = (day: DayType, bookingColors?: BookingColorType) => {
   }
 
   if (day.bookingType && !day.isStartDate && !day.isEndDate) {
-    return style[`${day.bookingType}DayBooking`];
+    return periodColor
+      ? style.periodDayBooking
+      : style[`${day.bookingType}DayBooking`];
   }
 
   return style.day;
@@ -36,7 +42,8 @@ const selectStyleManager = (day: DayType, bookingColors?: BookingColorType) => {
 export const styleSelector = (
   day: DayType,
   editMode?: boolean,
-  bookingColors?: BookingColorType
+  bookingColors?: BookingColorType,
+  periodColor?: boolean
 ) => {
   if (Object.keys(day).length === 0) {
     return style.day;
@@ -47,10 +54,12 @@ export const styleSelector = (
   }
 
   if (editMode && !day.isBooking) {
-    return selectStyleManager(day, bookingColors);
+    return selectStyleManager(day, bookingColors, periodColor);
   }
 
-  return editMode ? style.day : selectStyleManager(day, bookingColors);
+  return editMode
+    ? style.day
+    : selectStyleManager(day, bookingColors, periodColor);
 };
 
 const WIDTH = 50;
@@ -70,12 +79,16 @@ export const getTypeColor = (
   type: "other" | "contract" | "option" | "owner",
   noLeftColor?: boolean,
   noRightColor?: boolean,
-  bookingColors?: BookingColorType
+  bookingColors?: BookingColorType,
+  periodColor?: boolean
 ): StyleProp<ViewStyle> => {
+  const periodTheme = { start: "#F7F7F7", end: "#F7F7F7" };
   const theme = {
-    other: { start: "#D9E8B0", end: "#D9E8B0" },
-    contract: { start: "#E2D1B5", end: "#E9DDC8" },
-    option: { start: "transparent", end: "transparent" },
+    other: periodColor ? periodTheme : { start: "#D9E8B0", end: "#D9E8B0" },
+    contract: periodColor ? periodTheme : { start: "#E2D1B5", end: "#E9DDC8" },
+    option: periodColor
+      ? periodTheme
+      : { start: "transparent", end: "transparent" },
     owner: {
       start: bookingColors?.owner?.startEnd || "#B8DED7",
       end: bookingColors?.owner?.startEnd || "#B8DED7",
@@ -146,5 +159,10 @@ export const style = StyleSheet.create({
     ...communStyle,
     borderColor: "#F1E8DA",
     backgroundColor: "#F1E8DA",
+  },
+  periodDayBooking: {
+    ...communStyle,
+    borderColor: "#F7F7F7",
+    backgroundColor: "#F7F7F7",
   },
 });

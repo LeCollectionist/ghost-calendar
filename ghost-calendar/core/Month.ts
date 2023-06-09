@@ -6,6 +6,7 @@ import {
   Period,
   BookingColorType,
   WorldTimezones,
+  PeriodRules,
 } from "./helpers/types";
 import {
   getMonthName,
@@ -29,6 +30,7 @@ export default class Month {
       checkOut?: Date;
       bookingColors?: BookingColorType;
       timezone?: WorldTimezones;
+      periodRules?: PeriodRules[];
     }
   ) {}
 
