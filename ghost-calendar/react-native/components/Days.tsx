@@ -52,8 +52,10 @@ export const Days = ({
     const fontWeightCondition =
       day.isInPeriod || day.startPeriod || day.endPeriod;
 
+    const periodCondition = Boolean(periodIsValid) ? day.isInPeriod : true;
+
     const pressConditon =
-      day.isInPeriod &&
+      periodCondition &&
       !day.isPastDay &&
       Object.keys(day).length !== 0 &&
       condition;
@@ -62,12 +64,14 @@ export const Days = ({
       <Pressable
         onPress={() => {
           if (pressConditon) {
-            const nextPeriod = getNextPeriod(
-              day.day as string,
-              periodRules,
-              defaultMinimumDuration
-            );
-            if (nextPeriod) setNextDay(nextPeriod);
+            if (periodIsValid) {
+              const nextPeriod = getNextPeriod(
+                day.day as string,
+                periodRules,
+                defaultMinimumDuration
+              );
+              if (nextPeriod) setNextDay(nextPeriod);
+            }
             onPressHandler({
               bookingDayHandler,
               days,
@@ -99,7 +103,7 @@ export const Days = ({
         )}
         <Text
           style={{
-            ...(getCurrentDayColor(day) as {}),
+            ...(getCurrentDayColor(day, Boolean(periodIsValid)) as {}),
             zIndex: 3,
             fontWeight: fontWeightCondition ? "bold" : "normal",
           }}

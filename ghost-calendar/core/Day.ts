@@ -124,7 +124,7 @@ export default class Day {
   }
 
   setPeriodRules(periodRules: PeriodRules[] | undefined) {
-    if (periodRules) {
+    if (periodRules && periodRules.length > 0) {
       periodRules.forEach((rule) => {
         const isStartAt = rule.startAt === this.day.day;
         const isBetween = checkBetweenDates(
@@ -180,7 +180,7 @@ export default class Day {
     periodRules: PeriodRules[] | undefined,
     defaultMinimumDuration?: number
   ) {
-    if (!this.day.periodType && periodRules) {
+    if (!this.day.periodType && periodRules && periodRules.length > 0) {
       this.day.periodType = "nightly";
       this.day.minimunDuration = defaultMinimumDuration || 1;
       this.day.isInPeriod = true;

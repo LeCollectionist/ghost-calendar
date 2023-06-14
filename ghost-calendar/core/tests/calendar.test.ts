@@ -71,9 +71,6 @@ describe("Calendar", () => {
         isSelectedDate: true,
         isStartDate: true,
         isPastDay: true,
-        isInPeriod: true,
-        minimunDuration: 1,
-        periodType: "nightly",
       });
       expect(findEndDay).toEqual({
         day: "2022-06-10",
@@ -81,18 +78,12 @@ describe("Calendar", () => {
         isSelectedDate: true,
         isEndDate: true,
         isPastDay: true,
-        isInPeriod: true,
-        minimunDuration: 1,
-        periodType: "nightly",
       });
       expect(findBetweenDay).toEqual({
         day: "2022-06-08",
         dayNumber: "8",
         isRangeDate: true,
         isPastDay: true,
-        isInPeriod: true,
-        minimunDuration: 1,
-        periodType: "nightly",
       });
     });
   });
@@ -114,25 +105,16 @@ describe("Calendar", () => {
         day: "2022-06-06",
         isPastDay: true,
         dayNumber: "6",
-        isInPeriod: true,
-        minimunDuration: 1,
-        periodType: "nightly",
       });
       expect(findEndDay).toEqual({
         day: "2022-06-10",
         dayNumber: "10",
         isPastDay: true,
-        isInPeriod: true,
-        minimunDuration: 1,
-        periodType: "nightly",
       });
       expect(findBetweenDay).toEqual({
         day: "2022-06-08",
         dayNumber: "8",
         isPastDay: true,
-        isInPeriod: true,
-        minimunDuration: 1,
-        periodType: "nightly",
       });
     });
   });
@@ -155,9 +137,6 @@ describe("Calendar", () => {
         isSelectedDate: true,
         isStartDate: true,
         isPastDay: true,
-        isInPeriod: true,
-        minimunDuration: 1,
-        periodType: "nightly",
       });
       expect(findEndDay).toEqual({
         day: "2022-06-19",
@@ -165,18 +144,12 @@ describe("Calendar", () => {
         isSelectedDate: true,
         isEndDate: true,
         isPastDay: true,
-        isInPeriod: true,
-        minimunDuration: 1,
-        periodType: "nightly",
       });
       expect(findBetweenDay).toEqual({
         day: "2022-06-18",
         dayNumber: "18",
         isRangeDate: true,
         isPastDay: true,
-        isInPeriod: true,
-        minimunDuration: 1,
-        periodType: "nightly",
       });
     });
   });
@@ -199,9 +172,6 @@ describe("Calendar", () => {
         isSelectedDate: true,
         isPastDay: true,
         isStartDate: true,
-        isInPeriod: true,
-        minimunDuration: 1,
-        periodType: "nightly",
       });
       expect(findEndDay).toEqual({
         day: "2022-06-25",
@@ -209,18 +179,12 @@ describe("Calendar", () => {
         isSelectedDate: true,
         isEndDate: true,
         isPastDay: true,
-        isInPeriod: true,
-        minimunDuration: 1,
-        periodType: "nightly",
       });
       expect(findBetweenDay).toEqual({
         day: "2022-06-22",
         dayNumber: "22",
         isRangeDate: true,
         isPastDay: true,
-        isInPeriod: true,
-        minimunDuration: 1,
-        periodType: "nightly",
       });
     });
   });

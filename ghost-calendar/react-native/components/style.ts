@@ -3,16 +3,16 @@ import { StyleSheet, StyleProp, ViewStyle } from "react-native";
 import { BookingColorType, DayType } from "../../core";
 import { communStyleType } from "./types";
 
-export const getCurrentDayColor = (day: DayType) => {
+export const getCurrentDayColor = (day: DayType, isPeriodMode: boolean) => {
   if (day.isCurrentDay || day.isStartDate || day.isEndDate) {
     return { fontWeight: "bold" };
   }
 
-  if (
-    day.isPastDay ||
-    !day.isInPeriod ||
-    (!day.isInPeriod && day.isCurrentDay)
-  ) {
+  const isPeriod = isPeriodMode
+    ? !day.isInPeriod || (!day.isInPeriod && day.isCurrentDay)
+    : false;
+
+  if (day.isPastDay || isPeriod) {
     return { color: "#aaaaaa" };
   }
 
