@@ -20,10 +20,11 @@ const newCalendar = createCalendar({
   startDate: startDateCalendar,
   endDate: endDateCalendar,
   rangeDates,
-  visualMonth: 2,
+  visualMonth: 12,
   bookingColors: {},
   timezone: "Europe/Paris",
   periodRules,
+  defaultMinimumDuration: 1,
 });
 
 function CalendarScreen() {
@@ -41,6 +42,8 @@ function CalendarScreen() {
         rangeMarkerHandler={(range) => range && setShowRange(range)}
         newCalendar={newCalendar}
         periodIsValid={(isValid) => console.log(isValid)}
+        periodRules={periodRules}
+        defaultMinimumDuration={1}
       />
       {showRange && (
         <View

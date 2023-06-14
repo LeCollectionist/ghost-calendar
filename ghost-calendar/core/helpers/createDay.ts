@@ -12,6 +12,7 @@ type CreateDayType = {
   bookingColors?: BookingColorType;
   timezone?: WorldTimezones;
   periodRules?: PeriodRules[];
+  defaultMinimumDuration?: number;
 };
 
 const excludePastDate = (
@@ -50,7 +51,8 @@ export const createDay = (props: CreateDayType) => {
     .setRangeDate(props.period, props.checkIn, props.checkOut)
     .isCheckInCheckOut(props.checkIn, props.checkOut)
     .isHalfDay()
-    .setPeriodRules(props.periodRules);
+    .setPeriodRules(props.periodRules)
+    .setDefaultPeriodRules(props.periodRules, props.defaultMinimumDuration);
 
   return day.build();
 };

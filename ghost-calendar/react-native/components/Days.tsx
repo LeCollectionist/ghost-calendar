@@ -1,14 +1,5 @@
-import { memo } from "react";
 import { View, Text, Pressable, Image } from "react-native";
-import { BookingColorType, CalendarVM, DayType } from "../../core";
-
-import {
-  getNextDay,
-  getPreviousDay,
-  periodHasCompleted,
-  periodHasNotEnDate,
-  periodHasNotStartDate,
-} from "./helper";
+import { BookingColorType, CalendarVM, DayType, PeriodRules } from "../../core";
 
 import {
   getCurrentDayColor,
@@ -16,9 +7,10 @@ import {
   style as calendarStyle,
 } from "./style";
 import { CurrentDayPointer } from "./CurrentDayPointer";
-import { CheckIn, CheckOut, CheckInCheckOut } from "./PeriodDelimiter";
 import { RangeType } from "./types";
 import { onPressHandler } from "./helpers/onPressHelper";
+import { getNextPeriod } from "./helpers/getNextPeriod";
+import { CheckMarker } from "./CheckMarker";
 
 export type DayComponentType = {
   bookingDayHandler?: (day: DayType) => void;
@@ -33,108 +25,58 @@ export type DayComponentType = {
   periodIsValid?: (isValid: boolean) => void;
   setPeriodIsValid: (isValid: boolean) => void;
   setDaysSelected: (day: DayType[]) => void;
-  setNextDay: (day: DayType) => void;
+  setNextDay: (day: PeriodRules) => void;
+  defaultMinimumDuration?: number;
 };
-
-type CheckMarkerType = {
-  day: DayType;
-  days: DayType[];
-  index: number;
-  editMode?: boolean;
-  bookingColors?: BookingColorType;
-  periodColor?: boolean;
-};
-
-export const CheckMarker = memo(
-  ({
-    day,
-    days,
-    index,
-    editMode,
-    bookingColors,
-    periodColor,
-  }: CheckMarkerType) => {
-    if (periodHasNotEnDate(day)) {
-      return (
-        <CheckIn
-          day={day}
-          editMode={editMode}
-          bookingColors={bookingColors}
-          periodColor={periodColor}
-        />
-      );
-    }
-
-    if (periodHasNotStartDate(day)) {
-      return (
-        <CheckOut
-          day={day}
-          editMode={editMode}
-          bookingColors={bookingColors}
-          periodColor={periodColor}
-        />
-      );
-    }
-
-    if (periodHasCompleted(day)) {
-      return (
-        <CheckInCheckOut
-          yesterday={getPreviousDay(days, index)}
-          tomorrow={getNextDay(days, index)}
-          editMode={editMode}
-          bookingColors={bookingColors}
-          periodColor={periodColor}
-        />
-      );
-    }
-
-    return null;
-  }
-);
 
 export const Days = ({
-  bookingDayHandler,
   days,
-  setPeriod,
-  withInteraction,
-  hasCompletedRange,
-  rangeMarkerHandler,
-  resetCalendar,
   calendar,
   bookingColors,
+  bookingDayHandler,
   periodIsValid,
-  setPeriodIsValid,
-  setDaysSelected,
   setNextDay,
   daysSelected,
-}: DayComponentType & { daysSelected: DayType[] }) => {
+  periodRules,
+  defaultMinimumDuration,
+  ...otherProps
+}: DayComponentType & {
+  daysSelected: DayType[];
+  periodRules?: PeriodRules[];
+}) => {
   const renderDays = days.map((day, idx) => {
     const isBookingOption =
       day.bookingType === "option" && !day.isStartDate && !day.isEndDate;
 
-    const nextDay = days[idx + 1];
-
     const condition = !day.isSelectedDate || daysSelected.length === 2;
+    const fontWeightCondition =
+      day.isInPeriod || day.startPeriod || day.endPeriod;
+
+    const pressConditon =
+      day.isInPeriod &&
+      !day.isPastDay &&
+      Object.keys(day).length !== 0 &&
+      condition;
 
     return (
       <Pressable
         onPress={() => {
-          if (!day.isPastDay && Object.keys(day).length !== 0 && condition) {
-            setNextDay(nextDay);
+          if (pressConditon) {
+            const nextPeriod = getNextPeriod(
+              day.day as string,
+              periodRules,
+              defaultMinimumDuration
+            );
+            if (nextPeriod) setNextDay(nextPeriod);
             onPressHandler({
               bookingDayHandler,
               days,
-              setPeriod,
-              withInteraction,
-              hasCompletedRange,
-              rangeMarkerHandler,
-              resetCalendar,
               calendar,
               bookingColors,
               day,
               periodIsValid,
-              setPeriodIsValid,
-              setDaysSelected,
+              defaultMinimumDuration,
+              ...otherProps,
             });
           }
         }}
@@ -159,6 +101,7 @@ export const Days = ({
           style={{
             ...(getCurrentDayColor(day) as {}),
             zIndex: 3,
+            fontWeight: fontWeightCondition ? "bold" : "normal",
           }}
         >
           {day.dayNumber}

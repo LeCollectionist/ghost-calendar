@@ -13,13 +13,23 @@ export type PeriodType =
 export type DayRuleType = "nightly" | PeriodType;
 
 type PeriodRulesValidatorInput = {
-  startAt: { date: string; dayRule: DayRuleType; mininumDuration: number };
-  endAt: { date: string; dayRule: DayRuleType; mininumDuration: number };
+  startAt: {
+    date: string;
+    dayRule: DayRuleType;
+    mininumDuration: number;
+    period?: { startDate: string; endDate: string };
+  };
+  endAt: {
+    date: string;
+    dayRule: DayRuleType;
+    mininumDuration: number;
+    period?: { startDate: string; endDate: string };
+  };
 };
 
 const NB_DAYS_OF_ONE_WEEK = 7;
 
-const WEEKLY_DAYS_NUMBER = {
+export const WEEKLY_DAYS_NUMBER = {
   weekly_by_sunday: 0,
   weekly_by_monday: 1,
   weekly_by_tuesday: 2,
@@ -29,11 +39,8 @@ const WEEKLY_DAYS_NUMBER = {
   weekly_by_saturday: 6,
 };
 
-const getMinimumDurationDays = (mininumDuration: number) =>
+export const getMinimumDurationDays = (mininumDuration: number) =>
   NB_DAYS_OF_ONE_WEEK * mininumDuration;
-
-const getPreviousMonthDays = (totalDays: number, mininumDuration: number) =>
-  totalDays - mininumDuration;
 
 const dateAtRuleIsOk = (
   date: Dayjs,
@@ -78,6 +85,32 @@ const getMinimunDuration = (input: PeriodRulesValidatorInput) => {
   return endAt.mininumDuration;
 };
 
+const getNbDays = (input: PeriodRulesValidatorInput) => {
+  const { startAt, endAt } = input;
+  const endDate = dateHandler({ date: endAt.date });
+  const startDate = dateHandler({ date: startAt.date });
+
+  if (endAt.period && endAt.dayRule !== "nightly")
+    return getDiffDays({
+      startAt: {
+        date: endAt.period.startDate,
+        dayRule: endAt.dayRule,
+        mininumDuration: endAt.mininumDuration,
+        period: endAt.period,
+      },
+      endAt: {
+        date: endAt.date,
+        dayRule: endAt.dayRule,
+        mininumDuration: endAt.mininumDuration,
+        period: endAt.period,
+      },
+      startDate: dateHandler({ date: endAt.period.startDate }),
+      endDate: dateHandler({ date: endAt.date }),
+    });
+
+  return getDiffDays({ ...input, startDate, endDate });
+};
+
 const nightlyRuleValidator = (
   nbDays: number,
   input: PeriodRulesValidatorInput & { startDate: Dayjs }
@@ -96,18 +129,12 @@ const weeklyRuleValidator = (
   const { startAt, endAt, startDate, endDate } = input;
   const mininumDuration = getMinimunDuration({ startAt, endAt });
   const minimumDays = getMinimumDurationDays(mininumDuration);
-  const nbPreviousMonthDays = getPreviousMonthDays(nbDays, minimumDays);
-  const nbPreviousMonthDaysCondition = nbPreviousMonthDays >= 0;
-  const rulesOfMinimumDays = nbDays - nbPreviousMonthDays === minimumDays;
+  const rulesOfMinimumDays =
+    nbDays % mininumDuration === minimumDays % mininumDuration;
   const startAtIsOk = dateAtRuleIsOk(startDate, startAt);
   const endAtIsOk = dateAtRuleIsOk(endDate, endAt);
 
-  return (
-    startAtIsOk &&
-    nbPreviousMonthDaysCondition &&
-    endAtIsOk &&
-    rulesOfMinimumDays
-  );
+  return startAtIsOk && endAtIsOk && rulesOfMinimumDays;
 };
 
 export const periodRulesValidator = (input: PeriodRulesValidatorInput) => {
@@ -115,7 +142,7 @@ export const periodRulesValidator = (input: PeriodRulesValidatorInput) => {
   const dayRule = endAt.dayRule;
   const endDate = dateHandler({ date: endAt.date });
   const startDate = dateHandler({ date: startAt.date });
-  const nbDays = getDiffDays({ ...input, startDate, endDate });
+  const nbDays = getNbDays(input);
 
   if (dayRule.includes("weekly"))
     return weeklyRuleValidator(nbDays, { ...input, startDate, endDate });

@@ -23,31 +23,16 @@ type CalendarProps = {
   bookingColors: BookingColorType;
   timezone?: WorldTimezones;
   periodRules: PeriodRules[];
+  defaultMinimumDuration?: number;
 };
 
 export const createCalendar = ({
   locale,
   startDate,
-  endDate,
-  checkIn,
-  checkOut,
-  rangeDates,
-  visualMonth,
-  bookingColors,
   timezone,
-  periodRules,
+  ...otherProps
 }: CalendarProps) => ({
-  calendar: new Calendar({
-    startDate,
-    endDate,
-    checkIn,
-    checkOut,
-    rangeDates,
-    visualMonth,
-    bookingColors,
-    timezone,
-    periodRules,
-  }),
+  calendar: new Calendar({ startDate, timezone, ...otherProps }),
   presenter: new CalendarPresenter(locale, startDate, timezone),
 });
 

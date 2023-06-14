@@ -5,6 +5,7 @@ import {
   CalendarPresenter,
   DayType,
   LocaleType,
+  PeriodRules,
 } from "../../core";
 
 import { useCalendar } from "../hooks/useCalendar";
@@ -27,6 +28,8 @@ type CalendarComponentType = {
   };
   locale: LocaleType;
   periodIsValid?: (isValid: boolean) => void;
+  periodRules?: PeriodRules[];
+  defaultMinimumDuration?: number;
 };
 
 const CalendarComponent = ({
@@ -37,10 +40,12 @@ const CalendarComponent = ({
   newCalendar,
   locale,
   periodIsValid,
+  periodRules,
+  defaultMinimumDuration,
 }: CalendarComponentType) => {
   const [isValid, setPeriodIsValid] = useState(true);
   const [daysSelected, setDaysSelected] = useState<DayType[]>([]);
-  const [nextDay, setNextDay] = useState<DayType | null>(null);
+  const [nextDay, setNextDay] = useState<PeriodRules | null>(null);
   const { calendar, setPeriod, resetCalendar } = useCalendar({
     newCalendar,
   });
@@ -60,7 +65,7 @@ const CalendarComponent = ({
       }}
     >
       <Week locale={locale} />
-      {!isValid && (
+      {!isValid && periodIsValid && (
         <PeriodInfo
           locale={locale}
           daysSelected={daysSelected}
@@ -91,6 +96,8 @@ const CalendarComponent = ({
               setDaysSelected={setDaysSelected}
               setNextDay={setNextDay}
               daysSelected={daysSelected}
+              periodRules={periodRules}
+              defaultMinimumDuration={defaultMinimumDuration}
             />
             {index === calendar.months.length - 1 && (
               <View style={{ marginBottom: 80 }} />

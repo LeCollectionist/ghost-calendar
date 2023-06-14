@@ -40,6 +40,11 @@ export type DayType = {
   privateNote?: string;
   minimunDuration?: number;
   periodType?: DayRuleType;
+  periodRange?: { startDate: string; endDate: string };
+  startPeriod?: boolean;
+  endPeriod?: boolean;
+  nightlyDay?: boolean;
+  isInPeriod?: boolean;
 };
 
 export type MonthType = {

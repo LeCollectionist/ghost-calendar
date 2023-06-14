@@ -31,6 +31,7 @@ export default class Month {
       bookingColors?: BookingColorType;
       timezone?: WorldTimezones;
       periodRules?: PeriodRules[];
+      defaultMinimumDuration?: number;
     }
   ) {}
 

@@ -1,4 +1,9 @@
-import { dayFormatter } from "./helpers/date";
+import { dateHandler, dayFormatter } from "./helpers/date";
+import {
+  PeriodType,
+  WEEKLY_DAYS_NUMBER,
+  getMinimumDurationDays,
+} from "./helpers/periodRules";
 import {
   DayType,
   Period,
@@ -129,11 +134,56 @@ export default class Day {
         );
         const isEndAt = rule.endAt === this.day.day;
 
-        if (isStartAt || isBetween || isEndAt) {
+        if ((!this.day.periodType && isStartAt) || isBetween || isEndAt) {
           this.day.minimunDuration = rule.minimumDuration;
           this.day.periodType = rule.periodType;
+          this.day.periodRange = {
+            startDate: rule.startAt,
+            endDate: rule.endAt,
+          };
+        }
+
+        if (isStartAt) {
+          this.day.startPeriod = true;
+          this.day.isInPeriod = true;
+        }
+        if (isEndAt) {
+          this.day.endPeriod = true;
+          this.day.isInPeriod = true;
+        }
+        if (isBetween) {
+          if (
+            this.day.periodType?.includes("weekly") &&
+            this.day.minimunDuration
+          ) {
+            const diffDay = dateHandler({ date: this.day.day }).diff(
+              dateHandler({ date: rule.startAt }),
+              "days"
+            );
+            const d = dateHandler({ date: this.day.day }).get("day");
+            const test = WEEKLY_DAYS_NUMBER[this.day.periodType as PeriodType];
+            if (d === test && diffDay % this.day.minimunDuration === 0) {
+              this.day.isInPeriod = true;
+            }
+          }
+
+          if (this.day.periodType === "nightly") {
+            this.day.isInPeriod = true;
+          }
         }
       });
+    }
+    return this;
+  }
+
+  setDefaultPeriodRules(
+    periodRules: PeriodRules[] | undefined,
+    defaultMinimumDuration?: number
+  ) {
+    if (!this.day.periodType && periodRules) {
+      this.day.periodType = "nightly";
+      this.day.minimunDuration = defaultMinimumDuration || 1;
+      this.day.isInPeriod = true;
     }
     return this;
   }

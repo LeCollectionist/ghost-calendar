@@ -1,5 +1,5 @@
 import { View, Text } from "react-native";
-import { DayType, LocaleType } from "../../core";
+import { DayType, LocaleType, PeriodRules } from "../../core";
 import { style as customStyle } from "./style";
 import { DayRuleType, PeriodType } from "../../core/helpers/periodRules";
 
@@ -50,7 +50,7 @@ const PeriodMessage = ({
   day,
   locale,
 }: {
-  day: DayType;
+  day: PeriodRules;
   locale: LocaleType;
 }) => (
   <View
@@ -65,11 +65,11 @@ const PeriodMessage = ({
   >
     <View style={[customStyle.day, { width: "100%" }]}>
       <Text>
-        {day.minimunDuration || 1}{" "}
+        {day.minimumDuration || 1}{" "}
         {getTypeOfPeriod({
           locale: locale as Locale,
           periodType: day.periodType as DayRuleType,
-          minimunDuration: day.minimunDuration || 1,
+          minimunDuration: day.minimumDuration || 1,
         })}
         {PeriodTypeTrads[locale as Locale][day.periodType as PeriodType]}
       </Text>
@@ -84,16 +84,9 @@ export const PeriodInfo = ({
 }: {
   locale: LocaleType;
   daysSelected: DayType[];
-  nextDay: DayType | null;
+  nextDay: PeriodRules | null;
 }) => {
-  const info = daysSelected[0];
-
-  if (nextDay?.periodType && !daysSelected[1])
-    return <PeriodMessage day={nextDay} locale={locale} />;
-  else if (nextDay?.periodType && daysSelected[1]?.periodType)
-    return <PeriodMessage day={daysSelected[1]} locale={locale} />;
-
-  if (info?.periodType) return <PeriodMessage day={info} locale={locale} />;
+  if (nextDay) return <PeriodMessage day={nextDay} locale={locale} />;
 
   return null;
 };

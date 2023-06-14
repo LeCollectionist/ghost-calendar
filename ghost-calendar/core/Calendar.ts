@@ -22,6 +22,7 @@ export default class Calendar {
       bookingColors: BookingColorType;
       timezone?: WorldTimezones;
       periodRules: PeriodRules[];
+      defaultMinimumDuration?: number;
     }
   ) {}
 

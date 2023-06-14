@@ -8,7 +8,11 @@ export const getCurrentDayColor = (day: DayType) => {
     return { fontWeight: "bold" };
   }
 
-  if (day.isPastDay) {
+  if (
+    day.isPastDay ||
+    !day.isInPeriod ||
+    (!day.isInPeriod && day.isCurrentDay)
+  ) {
     return { color: "#aaaaaa" };
   }
 
