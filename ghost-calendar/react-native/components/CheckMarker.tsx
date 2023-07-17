@@ -16,6 +16,7 @@ type CheckMarkerType = {
   editMode?: boolean;
   bookingColors?: BookingColorType;
   periodColor?: boolean;
+  daysSelected: DayType[];
 };
 
 export const CheckMarker = memo(
@@ -26,6 +27,7 @@ export const CheckMarker = memo(
     editMode,
     bookingColors,
     periodColor,
+    daysSelected,
   }: CheckMarkerType) => {
     if (periodHasNotEnDate(day)) {
       return (
@@ -57,6 +59,7 @@ export const CheckMarker = memo(
           editMode={editMode}
           bookingColors={bookingColors}
           periodColor={periodColor}
+          daysSelected={daysSelected}
         />
       );
     }

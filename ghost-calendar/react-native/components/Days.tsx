@@ -94,6 +94,7 @@ export const Days = ({
           index={idx}
           bookingColors={bookingColors}
           periodColor={Boolean(periodIsValid)}
+          daysSelected={daysSelected}
         />
         {isBookingOption && !Boolean(periodIsValid) && (
           <Image

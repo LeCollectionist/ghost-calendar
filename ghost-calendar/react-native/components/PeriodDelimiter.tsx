@@ -94,14 +94,75 @@ export const CheckInCheckOut = ({
   editMode,
   bookingColors,
   periodColor,
+  daysSelected,
 }: {
   yesterday: DayType;
   tomorrow: DayType;
   editMode?: boolean;
   bookingColors?: BookingColorType;
   periodColor?: boolean;
+  daysSelected: DayType[];
 }) => {
+  const dayNumber = Number(tomorrow.dayNumber) - 1;
+  const findDay = daysSelected.find((el) => Number(el.dayNumber) === dayNumber);
+
   if (yesterday.bookingType && tomorrow.bookingType) {
+    if (
+      findDay &&
+      dayNumber === Number(yesterday.dayNumber) + 1 &&
+      tomorrow.isStartDate
+    ) {
+      return (
+        <>
+          <View
+            style={getTypeColor(
+              yesterday.bookingType,
+              false,
+              true,
+              bookingColors,
+              periodColor
+            )}
+          />
+          <View
+            style={getTypeColor(
+              "owner",
+              true,
+              false,
+              bookingColors,
+              periodColor
+            )}
+          />
+        </>
+      );
+    } else if (
+      findDay &&
+      dayNumber === Number(yesterday.dayNumber) + 1 &&
+      !tomorrow.isStartDate
+    ) {
+      return (
+        <>
+          <View
+            style={getTypeColor(
+              "owner",
+              false,
+              true,
+              bookingColors,
+              periodColor
+            )}
+          />
+          <View
+            style={getTypeColor(
+              tomorrow.bookingType,
+              true,
+              false,
+              bookingColors,
+              periodColor
+            )}
+          />
+        </>
+      );
+    }
+
     return !editMode ? (
       <>
         {yesterday.bookingType === "option" && !periodColor && (

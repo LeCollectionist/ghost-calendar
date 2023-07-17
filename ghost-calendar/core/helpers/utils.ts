@@ -83,6 +83,19 @@ const findMonth = (
   });
 };
 
+const findMonthsBetweenTwoDates = (
+  startKeyMonth: number,
+  endKeyMonth: number
+) => {
+  const numberList: number[] = [];
+
+  for (let i = startKeyMonth; i <= endKeyMonth; i++) {
+    numberList.push(i);
+  }
+
+  return numberList;
+};
+
 const pushBookingDates = (
   monthFound: MonthType | undefined,
   startDate: DateType,
@@ -102,7 +115,7 @@ const pushBookingDates = (
     });
 
     daysFound.forEach((day) => {
-      if (day.isBooking && !day.isEndDate && !day.isStartDate) {
+      if (day.isBooking && (!day.isEndDate || !day.isStartDate)) {
         bookingDate.push(day);
       }
     });
@@ -141,22 +154,33 @@ export const getBookingDates = (
   const endDateMonth = endDate.get("month");
   const endDateYear = endDate.get("year");
 
-  if (endDateMonth === startDateMonth) {
-    const monthFound = findMonth(presenter, endDateMonth, endDateYear);
+  const diffDays = dayjs(endDayState).diff(startDayState, "day");
 
-    pushBookingDates(monthFound, startDate, endDate, bookingDate);
-  } else if (endDateMonth > startDateMonth && startDateYear === endDateYear) {
-    const fistMonthFound = findMonth(presenter, startDateMonth, startDateYear);
-    const secondMonthFound = findMonth(presenter, endDateMonth, endDateYear);
+  if (diffDays > 1) {
+    if (endDateMonth === startDateMonth) {
+      const monthFound = findMonth(presenter, endDateMonth, endDateYear);
 
-    pushBookingDates(fistMonthFound, startDate, endDate, bookingDate);
-    pushBookingDates(secondMonthFound, startDate, endDate, bookingDate);
-  } else if (startDateYear < endDateYear) {
-    const fistMonthFound = findMonth(presenter, startDateMonth, startDateYear);
-    const secondMonthFound = findMonth(presenter, endDateMonth, endDateYear);
+      pushBookingDates(monthFound, startDate, endDate, bookingDate);
+    } else if (endDateMonth > startDateMonth && startDateYear === endDateYear) {
+      const keyMonthsList = findMonthsBetweenTwoDates(
+        startDateMonth,
+        endDateMonth
+      );
+      keyMonthsList.forEach((value) => {
+        const monthFound = findMonth(presenter, value, startDateYear);
+        pushBookingDates(monthFound, startDate, endDate, bookingDate);
+      });
+    } else if (startDateYear < endDateYear) {
+      const fistMonthFound = findMonth(
+        presenter,
+        startDateMonth,
+        startDateYear
+      );
+      const secondMonthFound = findMonth(presenter, endDateMonth, endDateYear);
 
-    pushBookingDates(fistMonthFound, startDate, endDate, bookingDate);
-    pushBookingDates(secondMonthFound, startDate, endDate, bookingDate);
+      pushBookingDates(fistMonthFound, startDate, endDate, bookingDate);
+      pushBookingDates(secondMonthFound, startDate, endDate, bookingDate);
+    }
   }
 
   return bookingDate;
@@ -189,23 +213,33 @@ export const getBookingDateUi = (
   const startDateYear = startDate.get("year");
   const endDateMonth = endDate.get("month");
   const endDateYear = endDate.get("year");
+  const diffDays = dayjs(endDayState).diff(startDayState, "day");
 
-  if (endDateMonth === startDateMonth) {
-    const monthFound = findMonthT(calendar, endDateMonth, endDateYear);
+  if (diffDays > 1) {
+    if (endDateMonth === startDateMonth) {
+      const monthFound = findMonthT(calendar, endDateMonth, endDateYear);
 
-    pushBookingDates(monthFound, startDate, endDate, bookingDate);
-  } else if (endDateMonth > startDateMonth && startDateYear === endDateYear) {
-    const fistMonthFound = findMonthT(calendar, startDateMonth, startDateYear);
-    const secondMonthFound = findMonthT(calendar, endDateMonth, endDateYear);
+      pushBookingDates(monthFound, startDate, endDate, bookingDate);
+    } else if (endDateMonth > startDateMonth && startDateYear === endDateYear) {
+      const keyMonthsList = findMonthsBetweenTwoDates(
+        startDateMonth,
+        endDateMonth
+      );
+      keyMonthsList.forEach((value) => {
+        const monthFound = findMonthT(calendar, value, startDateYear);
+        pushBookingDates(monthFound, startDate, endDate, bookingDate);
+      });
+    } else if (startDateYear < endDateYear) {
+      const fistMonthFound = findMonthT(
+        calendar,
+        startDateMonth,
+        startDateYear
+      );
+      const secondMonthFound = findMonthT(calendar, endDateMonth, endDateYear);
 
-    pushBookingDates(fistMonthFound, startDate, endDate, bookingDate);
-    pushBookingDates(secondMonthFound, startDate, endDate, bookingDate);
-  } else if (startDateYear < endDateYear) {
-    const fistMonthFound = findMonthT(calendar, startDateMonth, startDateYear);
-    const secondMonthFound = findMonthT(calendar, endDateMonth, endDateYear);
-
-    pushBookingDates(fistMonthFound, startDate, endDate, bookingDate);
-    pushBookingDates(secondMonthFound, startDate, endDate, bookingDate);
+      pushBookingDates(fistMonthFound, startDate, endDate, bookingDate);
+      pushBookingDates(secondMonthFound, startDate, endDate, bookingDate);
+    }
   }
 
   return bookingDate;

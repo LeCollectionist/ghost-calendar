@@ -53,13 +53,14 @@ export const onPressHandler = ({
     (day.isBooking && (day.isStartDate || day.isEndDate)) || !day.isBooking;
   if (rangeMarkerHandler && day && condition) {
     ajouterElementD(day);
-    if (periodIsValid)
+    if (periodIsValid) {
       periodManager({
         periodIsValid,
         setPeriodIsValid,
         setDaysSelected,
         defaultMinimumDuration,
       });
+    }
 
     if (daysD.length === 2) {
       if (dayjs(daysD[1].day).diff(daysD[0].day) < 0 && daysD.length === 2)
