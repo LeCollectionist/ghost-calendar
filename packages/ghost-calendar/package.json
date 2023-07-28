@@ -50,5 +50,6 @@
     "@shopify/flash-list": "1.4.0",
     "dayjs": "^1.11.7"
   },
-  "repository": "https://github.com/joffreyBerrier/ghost-calendar/tree/dev"
+  "repository": "https://github.com/joffreyBerrier/ghost-calendar/tree/dev",
+  "private": false
 }
