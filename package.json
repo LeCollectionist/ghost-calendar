@@ -6,5 +6,6 @@
   "description": "",
   "workspaces": [
     "lc-ghost-calendar"
-  ]
+  ],
+  "private": true
 }
