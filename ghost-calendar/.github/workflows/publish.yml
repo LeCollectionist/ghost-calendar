@@ -15,7 +15,7 @@ jobs:
         with:
           node-version: "16.17.0"
           registry-url: "https://registry.npmjs.org"
-      - run: yarn workspace lc-ghost-calendar install --silent
-      - run: npm publish --workspace=lc-ghost-calendar
+      - run: yarn install --silent
+      - run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
