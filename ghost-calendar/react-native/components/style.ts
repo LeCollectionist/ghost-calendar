@@ -1,10 +1,12 @@
 import { StyleSheet, StyleProp, ViewStyle } from "react-native";
 
 import { BookingColorType, DayType } from "../../core";
-import { communStyleType } from "./types";
 
 export const getCurrentDayColor = (day: DayType, isPeriodMode: boolean) => {
-  if (day.isCurrentDay || day.isStartDate || day.isEndDate) {
+  const isStartOrEndAndNotPast =
+    (day.isStartDate || day.isEndDate) && !day.isPastDay;
+
+  if (day.isCurrentDay || isStartOrEndAndNotPast) {
     return { fontWeight: "bold" };
   }
 
@@ -12,7 +14,10 @@ export const getCurrentDayColor = (day: DayType, isPeriodMode: boolean) => {
     ? !day.isInPeriod || (!day.isInPeriod && day.isCurrentDay)
     : false;
 
-  if (day.isPastDay || isPeriod) {
+  const hasContract =
+    isPeriodMode && day.bookingType === "contract" ? true : false;
+
+  if (day.isPastDay || isPeriod || hasContract) {
     return { color: "#aaaaaa" };
   }
 
@@ -34,6 +39,10 @@ const selectStyleManager = (
     };
   }
 
+  if (periodColor && day.isPastDay) {
+    return style.periodDayBooking;
+  }
+
   if (day.bookingType && !day.isStartDate && !day.isEndDate) {
     return periodColor
       ? style.periodDayBooking
@@ -49,6 +58,10 @@ export const styleSelector = (
   bookingColors?: BookingColorType,
   periodColor?: boolean
 ) => {
+  if (day.isPastDay) {
+    return selectStyleManager(day, bookingColors, periodColor);
+  }
+
   if (Object.keys(day).length === 0) {
     return style.day;
   }
@@ -68,7 +81,7 @@ export const styleSelector = (
 
 const WIDTH = 50;
 
-const communStyle: communStyleType = {
+const communStyle: any = {
   width: "13%",
   height: WIDTH,
   flexDirection: "row",

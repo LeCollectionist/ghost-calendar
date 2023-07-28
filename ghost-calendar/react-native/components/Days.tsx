@@ -50,11 +50,17 @@ export const Days = ({
 
     const condition = !day.isSelectedDate || daysSelected.length === 2;
     const fontWeightCondition =
-      day.isInPeriod || day.startPeriod || day.endPeriod;
+      (day.isInPeriod || day.startPeriod || day.endPeriod) && !day.isPastDay;
 
     const periodCondition = Boolean(periodIsValid) ? day.isInPeriod : true;
+    const hasBookingType =
+      day.bookingType === "contract" && !(day.isStartDate || day.isEndDate)
+        ? false
+        : true;
+    const canPress = Boolean(periodIsValid) ? hasBookingType : true;
 
     const pressConditon =
+      canPress &&
       periodCondition &&
       !day.isPastDay &&
       Object.keys(day).length !== 0 &&
