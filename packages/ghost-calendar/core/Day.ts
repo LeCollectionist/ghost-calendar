@@ -33,6 +33,7 @@ export default class Day {
     this.day.ownerPrivateToken = day.ownerPrivateToken;
     this.day.ownerUploadYousignFileToken = day.ownerUploadYousignFileToken;
     this.day.isManualySignedContract = day.isManualySignedContract;
+    this.day.statusDisplayedToUser = day.statusDisplayedToUser;
   }
 
   getDate() {

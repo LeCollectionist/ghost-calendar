@@ -45,6 +45,7 @@ export type DayType = {
   endPeriod?: boolean;
   nightlyDay?: boolean;
   isInPeriod?: boolean;
+  statusDisplayedToUser?: "pending" | "confirmed" | "cancelled" | null;
 };
 
 export type MonthType = {
@@ -85,6 +86,7 @@ export type ContractInfo = {
   ownerPrice?: number;
   ownerPrivateToken?: string | null;
   ownerUploadYousignFileToken?: string | null;
+  statusDisplayedToUser?: "pending" | "confirmed" | "cancelled" | null;
 };
 
 export type OwnerInfo = {
