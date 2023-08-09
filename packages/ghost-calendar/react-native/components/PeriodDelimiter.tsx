@@ -106,7 +106,7 @@ export const CheckInCheckOut = ({
   const dayNumber = Number(tomorrow.dayNumber) - 1;
   const findDay = daysSelected.find((el) => Number(el.dayNumber) === dayNumber);
 
-  if (yesterday.bookingType && tomorrow.bookingType) {
+  if (yesterday?.bookingType && tomorrow?.bookingType) {
     if (
       findDay &&
       dayNumber === Number(yesterday.dayNumber) + 1 &&
@@ -165,10 +165,10 @@ export const CheckInCheckOut = ({
 
     return !editMode ? (
       <>
-        {yesterday.bookingType === "option" && !periodColor && (
+        {yesterday?.bookingType === "option" && !periodColor && (
           <Image source={require("./optionRight.png")} style={style.ach2} />
         )}
-        {tomorrow.bookingType === "option" && !periodColor && (
+        {tomorrow?.bookingType === "option" && !periodColor && (
           <Image source={require("./optionLeft.png")} style={style.ach2} />
         )}
         <HalfDaySeparator />
@@ -194,10 +194,10 @@ export const CheckInCheckOut = ({
     ) : null;
   }
 
-  if (!yesterday.bookingType && tomorrow.bookingType) {
+  if (!yesterday?.bookingType && tomorrow?.bookingType) {
     return (
       <>
-        {tomorrow.bookingType === "option" && !editMode && !periodColor && (
+        {tomorrow?.bookingType === "option" && !editMode && !periodColor && (
           <Image source={require("./optionLeft.png")} style={style.ach2} />
         )}
         <HalfDaySeparator />
@@ -219,10 +219,10 @@ export const CheckInCheckOut = ({
     );
   }
 
-  if (yesterday.bookingType && !tomorrow.bookingType) {
+  if (yesterday?.bookingType && !tomorrow?.bookingType) {
     return (
       <>
-        {yesterday.bookingType === "option" && !editMode && !periodColor && (
+        {yesterday?.bookingType === "option" && !editMode && !periodColor && (
           <Image source={require("./optionRight.png")} style={style.ach2} />
         )}
         <HalfDaySeparator />
