@@ -3,9 +3,5 @@
   "version": "1.0.0",
   "author": "Joffrey Berrier",
   "license": "ISC",
-  "private": true,
-  "workspaces": [
-    "lc-ghost-calendar",
-    "packages/*"
-  ]
+  "private": true
 }

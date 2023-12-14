@@ -31,10 +31,12 @@ export const createCalendar = ({
   startDate,
   timezone,
   ...otherProps
-}: CalendarProps) => ({
-  calendar: new Calendar({ startDate, timezone, ...otherProps }),
-  presenter: new CalendarPresenter(locale, startDate, timezone),
-});
+}: CalendarProps) => {
+  const calendar = new Calendar({ startDate, timezone, ...otherProps });
+  const presenter = new CalendarPresenter(locale, startDate, timezone);
+
+  return { calendar, presenter };
+};
 
 export const useCalendar = ({
   newCalendar,

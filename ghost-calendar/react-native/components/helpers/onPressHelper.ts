@@ -42,7 +42,12 @@ export const onPressHandler = ({
     ajouterElement(day);
     hasCompletedRange(daysT.length === 2);
   }
-  if (day.isBooking && bookingDayHandler) bookingDayHandler(day);
+  const bookingStart = day.isStartDate && day.isBooking;
+  const bookingBetween = day.isBooking && !day.isStartDate && !day.isEndDate;
+
+  if ((bookingBetween || bookingStart) && bookingDayHandler) {
+    bookingDayHandler(day);
+  }
 
   if (withInteraction) {
     setPeriod(day);

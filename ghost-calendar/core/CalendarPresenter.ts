@@ -78,7 +78,8 @@ export class CalendarPresenter extends Presenter<CalendarVM> {
   }) {
     for (let d = 0; d < this.dates.length; d++) {
       const currentDate = this.dates[d];
-      this.vm.months.push(
+      this.vm.months = [
+        ...this.vm.months,
         new Month({
           date: currentDate,
           period: props.period,
@@ -95,8 +96,8 @@ export class CalendarPresenter extends Presenter<CalendarVM> {
           .getMonthUniqueId()
           .getMonth()
           .getMonthIndex(d)
-          .build()
-      );
+          .build(),
+      ];
     }
   }
 
@@ -322,5 +323,7 @@ export class CalendarPresenter extends Presenter<CalendarVM> {
     if (this.vm.months.length === 0)
       this.generateMonths({ period, checkIn, checkOut, bookingColors });
     else this.updateMonths({ period });
+
+    this.notifyVM();
   }
 }
