@@ -63,7 +63,7 @@ const CalendarComponent = ({
   if (calendar.months.length === 0) return null;
 
   return (
-    <View style={{ marginTop: 15 }}>
+    <View>
       <Week locale={locale} />
       {!isValid && periodIsValid && (
         <PeriodInfo
