@@ -1,4 +1,4 @@
-import { memo } from "react";
+import React, { memo } from "react";
 import { BookingColorType, DayType } from "../../core";
 import {
   getNextDay,
@@ -54,8 +54,8 @@ export const CheckMarker = memo(
     if (periodHasCompleted(day)) {
       return (
         <CheckInCheckOut
-          yesterday={getPreviousDay(days, index)}
-          tomorrow={getNextDay(days, index)}
+          yesterday={getPreviousDay(days, index) || day}
+          tomorrow={getNextDay(days, index) || day}
           editMode={editMode}
           bookingColors={bookingColors}
           periodColor={periodColor}

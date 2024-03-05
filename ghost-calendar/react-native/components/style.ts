@@ -129,6 +129,8 @@ export const getTypeColor = (
       borderTopColor: noLeftColor ? "transparent" : theme[type].end,
     };
   }
+
+  return {};
 };
 
 export const style = StyleSheet.create({

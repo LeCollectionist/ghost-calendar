@@ -1,5 +1,6 @@
+import React from "react";
 import { View, Text } from "react-native";
-import { DayType, LocaleType, PeriodRules } from "../../core";
+import { LocaleType, PeriodRules } from "../../core";
 import { style as customStyle } from "./style";
 import { DayRuleType, PeriodType } from "../../core/helpers/periodRules";
 
@@ -79,11 +80,9 @@ const PeriodMessage = ({
 
 export const PeriodInfo = ({
   locale,
-  daysSelected,
   nextDay,
 }: {
   locale: LocaleType;
-  daysSelected: DayType[];
   nextDay: PeriodRules | null;
 }) => {
   if (nextDay) return <PeriodMessage day={nextDay} locale={locale} />;

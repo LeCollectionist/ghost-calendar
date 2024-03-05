@@ -81,7 +81,7 @@ export class CalendarPresenter extends Presenter<CalendarVM> {
       this.vm.months = [
         ...this.vm.months,
         new Month({
-          date: currentDate,
+          date: currentDate as Date,
           period: props.period,
           rangeDates: this.vm.rangeDates,
           checkIn: props.checkIn,
@@ -261,7 +261,7 @@ export class CalendarPresenter extends Presenter<CalendarVM> {
     this.notifyVM();
   }
 
-  displayInitializePeriod(months: MonthType[], calendarState: CalendarVM) {
+  displayInitializePeriod(_months: MonthType[], calendarState: CalendarVM) {
     this.vm.checkIn = "";
     this.vm.checkOut = "";
     this.vm.months = [];

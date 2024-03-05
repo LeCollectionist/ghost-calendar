@@ -1,9 +1,5 @@
 import { dateHandler, dayFormatter } from "./helpers/date";
-import {
-  PeriodType,
-  WEEKLY_DAYS_NUMBER,
-  getMinimumDurationDays,
-} from "./helpers/periodRules";
+import { PeriodType, WEEKLY_DAYS_NUMBER } from "./helpers/periodRules";
 import {
   DayType,
   Period,
@@ -234,9 +230,9 @@ export default class Day {
       if (
         bookingColors &&
         bookingColors[day.type] &&
-        bookingColors[day.type].startEnd
+        bookingColors[day.type]?.startEnd
       )
-        this.day.bookingColor = bookingColors[day.type].startEnd;
+        this.day.bookingColor = bookingColors[day.type]?.startEnd;
     }
 
     if (checkBetweenDates(day.startDate, day.endDate, this.day.day)) {
@@ -245,9 +241,9 @@ export default class Day {
       if (
         bookingColors &&
         bookingColors[day.type] &&
-        bookingColors[day.type].beetween
+        bookingColors[day.type]?.beetween
       )
-        this.day.bookingColor = bookingColors[day.type].beetween;
+        this.day.bookingColor = bookingColors[day.type]?.beetween;
     }
 
     if (day.endDate === this.day.day) {
@@ -256,9 +252,9 @@ export default class Day {
       if (
         bookingColors &&
         bookingColors[day.type] &&
-        bookingColors[day.type].startEnd
+        bookingColors[day.type]?.startEnd
       )
-        this.day.bookingColor = bookingColors[day.type].startEnd;
+        this.day.bookingColor = bookingColors[day.type]?.startEnd;
     }
   }
 
