@@ -14,7 +14,7 @@ import { useCalendar } from "../hooks/useCalendar";
 import { RangeType } from "./types";
 import { Month } from "./Month";
 import { Week } from "./Week";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { PeriodInfo } from "./periodInfo";
 
 type CalendarComponentType = {

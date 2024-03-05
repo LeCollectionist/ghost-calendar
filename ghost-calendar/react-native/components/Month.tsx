@@ -1,5 +1,5 @@
 import { View, Text } from "react-native";
-import { memo } from "react";
+import React, { memo } from "react";
 import {
   BookingColorType,
   CalendarVM,
