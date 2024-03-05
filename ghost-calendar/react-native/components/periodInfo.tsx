@@ -1,3 +1,4 @@
+import React from "react";
 import { View, Text } from "react-native";
 import { DayType, LocaleType, PeriodRules } from "../../core";
 import { style as customStyle } from "./style";

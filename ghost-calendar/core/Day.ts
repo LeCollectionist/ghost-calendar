@@ -1,9 +1,5 @@
 import { dateHandler, dayFormatter } from "./helpers/date";
-import {
-  PeriodType,
-  WEEKLY_DAYS_NUMBER,
-  getMinimumDurationDays,
-} from "./helpers/periodRules";
+import { PeriodType, WEEKLY_DAYS_NUMBER } from "./helpers/periodRules";
 import {
   DayType,
   Period,
