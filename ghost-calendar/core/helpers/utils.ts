@@ -69,6 +69,8 @@ export const checkBetweenDates = (
 
     return false;
   }
+
+  return false;
 };
 
 const findMonth = (
@@ -80,6 +82,8 @@ const findMonth = (
     if (month.monthKey === endDateMonth && month.yearKey === endDateYear) {
       return month;
     }
+
+    return undefined;
   });
 };
 
@@ -112,6 +116,8 @@ const pushBookingDates = (
           return day;
         }
       }
+
+      return undefined;
     });
 
     daysFound.forEach((day) => {
@@ -195,6 +201,8 @@ const findMonthT = (
     if (month.monthKey === endDateMonth && month.yearKey === endDateYear) {
       return month;
     }
+
+    return undefined;
   });
 };
 

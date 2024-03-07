@@ -39,4 +39,6 @@ export const getNextPeriod = (
       minimumDuration: defaultMinimumDuration || 1,
     };
   }
+
+  return undefined;
 };

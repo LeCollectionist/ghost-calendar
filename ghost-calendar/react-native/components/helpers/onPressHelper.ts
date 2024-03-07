@@ -68,7 +68,7 @@ export const onPressHandler = ({
     }
 
     if (daysD.length === 2) {
-      if (dayjs(daysD[1].day).diff(daysD[0].day) < 0 && daysD.length === 2)
+      if (dayjs(daysD[1]?.day).diff(daysD[0]?.day) < 0 && daysD.length === 2)
         ajouterElementD(day);
 
       if (

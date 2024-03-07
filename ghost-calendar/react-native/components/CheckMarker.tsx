@@ -54,8 +54,8 @@ export const CheckMarker = memo(
     if (periodHasCompleted(day)) {
       return (
         <CheckInCheckOut
-          yesterday={getPreviousDay(days, index)}
-          tomorrow={getNextDay(days, index)}
+          yesterday={getPreviousDay(days, index) || day}
+          tomorrow={getNextDay(days, index) || day}
           editMode={editMode}
           bookingColors={bookingColors}
           periodColor={periodColor}
