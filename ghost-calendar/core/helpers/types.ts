@@ -50,6 +50,7 @@ export type DayType = {
 
 export type MonthType = {
   days: DayType[];
+  rangeDates?: DayType[];
   id?: string;
   monthKey?: number;
   yearKey?: number;

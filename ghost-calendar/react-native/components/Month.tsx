@@ -10,6 +10,7 @@ import {
 
 import { Days } from "./Days";
 import { RangeType } from "./types";
+import { Ranges } from "./Ranges";
 
 type MonthComponentType = {
   month: MonthType;
@@ -46,5 +47,6 @@ export const Month = memo(({ month, ...otherProps }: MonthComponentType) => (
       </Text>
     </View>
     <Days days={month.days} {...otherProps} />
+    <Ranges days={month.rangeDates || []} absolute {...otherProps} />
   </>
 ));

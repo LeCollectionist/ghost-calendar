@@ -101,37 +101,46 @@ export class CalendarPresenter extends Presenter<CalendarVM> {
     }
   }
 
-  private canSetDayOfMonth(dayOfmonth: DayType, props: DaysManagementType) {
-    const isSameDay = dayOfmonth.day === props.startDateDay.day;
-    const isReelDay = Object.keys(dayOfmonth).length !== 0;
-    const isFullyDay =
-      props.period &&
-      props.period.startDate &&
-      props.period.endDate &&
-      checkBetweenDates(
-        props.period.startDate,
-        props.period.endDate,
-        dayOfmonth.day
-      );
-
-    return Boolean(isSameDay || isReelDay || isFullyDay);
-  }
-
   private daysManagement(props: DaysManagementType) {
     if (props.days && props.days.length >= 0) {
-      return props.days.map((dayOfmonth) => {
-        if (this.canSetDayOfMonth(dayOfmonth, props)) {
-          dayOfmonth = createDay({
-            day: dateHandler({
-              date: dayOfmonth.day,
-              timezone: this.timezone,
-            }),
-            ...props,
-          });
+      const updatedDays = props.days.reduce((acc: DayType[], curr: DayType) => {
+        if (
+          props.period &&
+          props.period.startDate &&
+          props.period.endDate &&
+          checkBetweenDates(
+            props.period.startDate,
+            props.period.endDate,
+            curr.day
+          )
+        ) {
+          acc.push(
+            createDay({
+              day: dateHandler({ date: curr.day, timezone: this.timezone }),
+              ...props,
+            })
+          );
+        } else if (
+          curr.day === props.period.startDate ||
+          curr.day === props.period.endDate
+        ) {
+          acc.push(
+            createDay({
+              day: dateHandler({ date: curr.day, timezone: this.timezone }),
+              ...props,
+            })
+          );
+        } else {
+          if (curr.isPastDay || curr.isCurrentDay) {
+            acc.push(curr);
+          } else {
+            acc.push({ day: curr.day, dayNumber: curr.dayNumber });
+          }
         }
+        return acc;
+      }, []);
 
-        return { ...dayOfmonth };
-      });
+      return updatedDays;
     }
 
     return [];
@@ -144,7 +153,9 @@ export class CalendarPresenter extends Presenter<CalendarVM> {
     monthId,
     startDateDay,
   }: GetOtherMonthsChoosedType) {
+    if (startDateDay.isPastDay || startDateDay.isBooking) return null;
     const copyMonths = this.vm.months.filter((month) => month.id !== monthId);
+
     const otherMonths = copyMonths.map((month) => ({
       ...month,
       days: this.daysManagement({ ...days, days: month.days, startDateDay }),
@@ -162,16 +173,16 @@ export class CalendarPresenter extends Presenter<CalendarVM> {
     const endDateMonth = new Date(props.period.endDate || "").getMonth();
     const monthId = `${selectedDateMonthKey}-${selectedDateYearKey}`;
     const selectedDateMonth = this.vm.months.find((el) => el.id === monthId);
-    const startDateDay = {
-      ...selectedDateMonth?.days.find((day) => day.day === props.selectedDate),
-    };
+    const startDateDay = selectedDateMonth?.days.find(
+      (day) => day.day === props.selectedDate
+    );
 
     const otherMonthsChoose = this.getOtherMonthsChoosed({
       days: props,
       startDateMonth,
       endDateMonth,
       monthId,
-      startDateDay,
+      startDateDay: startDateDay || {},
     });
 
     const newSelectedMonths = {
@@ -179,13 +190,15 @@ export class CalendarPresenter extends Presenter<CalendarVM> {
       days: this.daysManagement({
         ...props,
         days: selectedDateMonth?.days as DayType[],
-        startDateDay,
+        startDateDay: startDateDay || {},
       }),
     };
 
-    this.vm.months = [...otherMonthsChoose, newSelectedMonths].sort(
-      (a, b) => Number(a.index) - Number(b.index)
-    );
+    this.vm.months = otherMonthsChoose
+      ? [...otherMonthsChoose, newSelectedMonths].sort(
+          (a, b) => Number(a.index) - Number(b.index)
+        )
+      : this.vm.months;
 
     this.notifyVM();
   }

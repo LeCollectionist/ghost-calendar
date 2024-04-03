@@ -1,4 +1,4 @@
-import { createDay } from "./helpers/createDay";
+import { createDay, excludePastDate } from "./helpers/createDay";
 import { dateHandler } from "./helpers/date";
 import {
   LocaleType,
@@ -15,11 +15,13 @@ import {
   DateType,
 } from "./helpers/utils";
 
+import Range from "./Range";
+
 const FIRST_DAY_OF_WEEK = 1;
 const MAX_DAYS_IN_MONTH = 42;
 
 export default class Month {
-  private month: MonthType = { days: [] };
+  private month: MonthType = { days: [], rangeDates: [] };
 
   constructor(
     private props: {
@@ -39,9 +41,30 @@ export default class Month {
     const belongsToThisMonth = day.get("month") === this.month?.monthKey;
 
     if (belongsToThisMonth) {
-      this.month.days.push(createDay({ day, ...this.props }));
+      const rangeDay = new Range(day)
+        .dayManagement({
+          range: excludePastDate(
+            this.props.rangeDates || [],
+            this.props.timezone
+          ),
+          options: {
+            bookingColors: this.props.bookingColors,
+          },
+        })
+        .isPast(dateHandler({ timezone: this.props.timezone }))
+        .setPeriodRules(this.props.periodRules)
+        .setDefaultPeriodRules(
+          this.props.periodRules,
+          this.props.defaultMinimumDuration
+        )
+        .getDayNumber()
+        .build();
+      const dayCreated = createDay({ day, ...this.props });
+      this.month.days.push(dayCreated);
+      this.month.rangeDates?.push(rangeDay);
     } else {
       this.month.days.push({});
+      this.month.rangeDates?.push({});
     }
   }
 
@@ -58,7 +81,7 @@ export default class Month {
   }
 
   getMonthKey() {
-    this.month = { days: [] };
+    this.month = { days: [], rangeDates: [] };
     this.month.monthKey = this.props.date.getMonth();
 
     return this;

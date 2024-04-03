@@ -26,7 +26,6 @@ const ajouterElementD = (nouvelElement: DayType): void => {
 
 export const onPressHandler = ({
   rangeMarkerHandler,
-  bookingDayHandler,
   calendar,
   day,
   hasCompletedRange,
@@ -37,27 +36,24 @@ export const onPressHandler = ({
   setPeriodIsValid,
   setDaysSelected,
   defaultMinimumDuration,
+  bookingDayHandler,
 }: Omit<DayComponentType, "setNextDay"> & { day: DayType }) => {
   if (hasCompletedRange && day) {
     ajouterElement(day);
     hasCompletedRange(daysT.length === 2);
-  }
-  const bookingStart = day.isStartDate && day.isBooking;
-  const bookingBetween = day.isBooking && !day.isStartDate && !day.isEndDate;
-
-  if ((bookingBetween || bookingStart) && bookingDayHandler) {
-    bookingDayHandler(day);
-  }
-
-  if (withInteraction) {
-    setPeriod(day);
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
   }
 
   const condition =
     (day.isBooking && (day.isStartDate || day.isEndDate)) || !day.isBooking;
   if (rangeMarkerHandler && day && condition) {
     ajouterElementD(day);
+
+    if (daysD.length === 1 && daysD[0]?.isStartDate) {
+      daysD = [];
+      if (bookingDayHandler) bookingDayHandler(day);
+      return;
+    }
+
     if (periodIsValid) {
       periodManager({
         periodIsValid,
@@ -70,23 +66,27 @@ export const onPressHandler = ({
     if (daysD.length === 2) {
       if (dayjs(daysD[1]?.day).diff(daysD[0]?.day) < 0 && daysD.length === 2)
         ajouterElementD(day);
-
       if (
         getBookingDateUi(calendar, daysD[0]?.day || "", daysD[1]?.day || "")
           .length > 0
       ) {
         ajouterElementD(day);
       }
-
-      rangeMarkerHandler({
-        startDate: daysD[0]?.day || "",
-        endDate: daysD[1]?.day || "",
-        resetCalendar: () => {
-          setPeriodIsValid(true);
-          resetCalendar();
-        },
-      });
     }
+
+    rangeMarkerHandler({
+      startDate: daysD[0]?.day || "",
+      endDate: daysD[1]?.day || "",
+      resetCalendar: () => {
+        setPeriodIsValid(true);
+        resetCalendar();
+      },
+    });
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+  }
+
+  if (withInteraction) {
+    setPeriod(day);
   }
 };
 

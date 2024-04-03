@@ -1,16 +1,10 @@
-import React from "react";
-import { View, Text, Pressable, Image } from "react-native";
+import React, { memo } from "react";
+import { View, Text, Image } from "react-native";
 import { BookingColorType, CalendarVM, DayType, PeriodRules } from "../../core";
 
-import {
-  getCurrentDayColor,
-  styleSelector,
-  style as calendarStyle,
-} from "./style";
+import { styleSelector, style as calendarStyle } from "./style";
 import { CurrentDayPointer } from "./CurrentDayPointer";
 import { RangeType } from "./types";
-import { onPressHandler } from "./helpers/onPressHelper";
-import { getNextPeriod } from "./helpers/getNextPeriod";
 import { CheckMarker } from "./CheckMarker";
 
 export type DayComponentType = {
@@ -28,110 +22,64 @@ export type DayComponentType = {
   setDaysSelected: (day: DayType[]) => void;
   setNextDay: (day: PeriodRules) => void;
   defaultMinimumDuration?: number;
+  absolute?: boolean;
 };
 
-export const Days = ({
-  days,
-  calendar,
-  bookingColors,
-  bookingDayHandler,
-  periodIsValid,
-  setNextDay,
-  daysSelected,
-  periodRules,
-  defaultMinimumDuration,
-  ...otherProps
-}: DayComponentType & {
-  daysSelected: DayType[];
-  periodRules?: PeriodRules[];
-}) => {
-  const renderDays = days.map((day, idx) => {
-    const isBookingOption =
-      day.bookingType === "option" && !day.isStartDate && !day.isEndDate;
+export const Days = memo(
+  ({
+    days,
+    bookingColors,
+    periodIsValid,
+    daysSelected,
+  }: DayComponentType & {
+    daysSelected: DayType[];
+    periodRules?: PeriodRules[];
+  }) => {
+    const renderDays = days.map((day, idx) => {
+      const isBookingOption =
+        day.bookingType === "option" && !day.isStartDate && !day.isEndDate;
 
-    const condition = !day.isSelectedDate || daysSelected.length === 2;
-    const fontWeightCondition =
-      (day.isInPeriod || day.startPeriod || day.endPeriod) && !day.isPastDay;
-
-    const periodCondition = Boolean(periodIsValid) ? day.isInPeriod : true;
-    const hasBookingType =
-      day.bookingType === "contract" && !(day.isStartDate || day.isEndDate)
-        ? false
-        : true;
-    const canPress = Boolean(periodIsValid) ? hasBookingType : true;
-
-    const pressConditon =
-      canPress &&
-      periodCondition &&
-      !day.isPastDay &&
-      Object.keys(day).length !== 0 &&
-      condition;
+      return (
+        <View
+          style={styleSelector(
+            day,
+            false,
+            bookingColors,
+            Boolean(periodIsValid)
+          )}
+          key={`${day.day}${idx}`}
+        >
+          {day.isCurrentDay && <CurrentDayPointer />}
+          <CheckMarker
+            day={day}
+            days={days}
+            index={idx}
+            bookingColors={bookingColors}
+            periodColor={Boolean(periodIsValid)}
+            daysSelected={daysSelected}
+          />
+          {isBookingOption && !Boolean(periodIsValid) && (
+            <Image
+              source={require("./optionFull.png")}
+              style={calendarStyle.ach}
+            />
+          )}
+          {day.isHalfDay && <Text style={{ zIndex: 3 }}>{day.dayNumber}</Text>}
+        </View>
+      );
+    });
 
     return (
-      <Pressable
-        onPress={() => {
-          if (pressConditon) {
-            if (periodIsValid) {
-              const nextPeriod = getNextPeriod(
-                day.day as string,
-                periodRules,
-                defaultMinimumDuration
-              );
-              if (nextPeriod) setNextDay(nextPeriod);
-            }
-            onPressHandler({
-              bookingDayHandler,
-              days,
-              calendar,
-              bookingColors,
-              day,
-              periodIsValid,
-              defaultMinimumDuration,
-              ...otherProps,
-            });
-          }
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "center",
+          flexWrap: "wrap",
+          width: "100%",
         }}
-        style={styleSelector(day, false, bookingColors, Boolean(periodIsValid))}
-        key={`${day.day}${idx}`}
       >
-        {day.isCurrentDay && <CurrentDayPointer />}
-        <CheckMarker
-          day={day}
-          days={days}
-          index={idx}
-          bookingColors={bookingColors}
-          periodColor={Boolean(periodIsValid)}
-          daysSelected={daysSelected}
-        />
-        {isBookingOption && !Boolean(periodIsValid) && (
-          <Image
-            source={require("./optionFull.png")}
-            style={calendarStyle.ach}
-          />
-        )}
-        <Text
-          style={{
-            ...(getCurrentDayColor(day, Boolean(periodIsValid)) as {}),
-            zIndex: 3,
-            fontWeight: fontWeightCondition ? "bold" : "normal",
-          }}
-        >
-          {day.dayNumber}
-        </Text>
-      </Pressable>
+        {renderDays}
+      </View>
     );
-  });
-
-  return (
-    <View
-      style={{
-        flexDirection: "row",
-        justifyContent: "center",
-        flexWrap: "wrap",
-        width: "100%",
-      }}
-    >
-      {renderDays}
-    </View>
-  );
-};
+  }
+);

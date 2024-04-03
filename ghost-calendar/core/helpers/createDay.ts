@@ -13,9 +13,10 @@ type CreateDayType = {
   timezone?: WorldTimezones;
   periodRules?: PeriodRules[];
   defaultMinimumDuration?: number;
+  checkRange?: boolean;
 };
 
-const excludePastDate = (
+export const excludePastDate = (
   rangeDates: Required<Period>[],
   timezone?: WorldTimezones
 ) => {
@@ -41,9 +42,6 @@ export const createDay = (props: CreateDayType) => {
   const day = new Day(props.day)
     .getDate()
     .getDayNumber()
-    .dayManagement(excludePastDate(props.rangeDates || [], props.timezone), {
-      bookingColors: props.bookingColors,
-    })
     .isCurrentDay(currentDate)
     .isPast(currentDate)
     .isStartDate(props.period?.startDate)
@@ -51,8 +49,7 @@ export const createDay = (props: CreateDayType) => {
     .setRangeDate(props.period, props.checkIn, props.checkOut)
     .isCheckInCheckOut(props.checkIn, props.checkOut)
     .isHalfDay()
-    .setPeriodRules(props.periodRules)
-    .setDefaultPeriodRules(props.periodRules, props.defaultMinimumDuration);
+    .setPeriodRules(props.periodRules);
 
   return day.build();
 };
