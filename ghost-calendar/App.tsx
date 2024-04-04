@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { View, Button } from "react-native";
+import "react-native-gesture-handler";
 
 import {
   CalendarComponent,

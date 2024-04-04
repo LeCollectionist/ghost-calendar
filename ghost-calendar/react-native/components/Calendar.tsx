@@ -1,5 +1,6 @@
 import { View, ActivityIndicator, useWindowDimensions } from "react-native";
 import { FlashList } from "@shopify/flash-list";
+import { FlatList, GestureHandlerRootView } from "react-native-gesture-handler";
 import {
   BookingColorType,
   Calendar,
@@ -31,6 +32,7 @@ type CalendarComponentType = {
   periodIsValid?: (isValid: boolean) => void;
   periodRules?: PeriodRules[];
   defaultMinimumDuration?: number;
+  withGesture?: boolean;
 };
 
 const CalendarComponent = memo(
@@ -44,6 +46,7 @@ const CalendarComponent = memo(
     periodIsValid,
     periodRules,
     defaultMinimumDuration,
+    withGesture = false,
   }: CalendarComponentType) => {
     const { height, width } = useWindowDimensions();
     const [isValid, setPeriodIsValid] = useState(true);
@@ -65,6 +68,12 @@ const CalendarComponent = memo(
 
     if (calendar.months.length === 0) return null;
 
+    const contentContainerStyle = {
+      paddingHorizontal: 12,
+      paddingTop: 12,
+      paddingBottom: 300,
+    };
+
     return (
       <View>
         <Week locale={locale} />
@@ -72,42 +81,73 @@ const CalendarComponent = memo(
           <PeriodInfo locale={locale} nextDay={nextDay} />
         )}
         <View style={{ height, width }}>
-          <FlashList
-            contentContainerStyle={{
-              paddingHorizontal: 12,
-              paddingTop: 12,
-              paddingBottom: 300,
-            }}
-            estimatedItemSize={150}
-            estimatedListSize={{ height, width }}
-            showsVerticalScrollIndicator={false}
-            data={calendar.months}
-            keyExtractor={(item) => String(item.id)}
-            renderItem={({ item: month, index }) => {
-              return (
-                <View key={`${month.id}${index}`}>
-                  <Month
-                    month={month}
-                    bookingDayHandler={bookingDayHandler}
-                    setPeriod={setPeriod}
-                    withInteraction={withInteraction}
-                    hasCompletedRange={hasCompletedRange}
-                    rangeMarkerHandler={rangeMarkerHandler}
-                    resetCalendar={resetCalendar}
-                    calendar={calendar}
-                    bookingColors={newCalendar.presenter.vm.bookingColors}
-                    periodIsValid={periodIsValid}
-                    setPeriodIsValid={setPeriodIsValid}
-                    setDaysSelected={setDaysSelected}
-                    setNextDay={setNextDay}
-                    daysSelected={daysSelected}
-                    periodRules={periodRules}
-                    defaultMinimumDuration={defaultMinimumDuration}
-                  />
-                </View>
-              );
-            }}
-          />
+          {withGesture ? (
+            <GestureHandlerRootView style={{ flex: 1 }}>
+              <FlatList
+                contentContainerStyle={contentContainerStyle}
+                showsVerticalScrollIndicator={false}
+                data={calendar.months}
+                keyExtractor={(item) => String(item.id)}
+                renderItem={({ item: month, index }) => {
+                  return (
+                    <View key={`${month.id}${index}`}>
+                      <Month
+                        month={month}
+                        bookingDayHandler={bookingDayHandler}
+                        setPeriod={setPeriod}
+                        withInteraction={withInteraction}
+                        hasCompletedRange={hasCompletedRange}
+                        rangeMarkerHandler={rangeMarkerHandler}
+                        resetCalendar={resetCalendar}
+                        calendar={calendar}
+                        bookingColors={newCalendar.presenter.vm.bookingColors}
+                        periodIsValid={periodIsValid}
+                        setPeriodIsValid={setPeriodIsValid}
+                        setDaysSelected={setDaysSelected}
+                        setNextDay={setNextDay}
+                        daysSelected={daysSelected}
+                        periodRules={periodRules}
+                        defaultMinimumDuration={defaultMinimumDuration}
+                      />
+                    </View>
+                  );
+                }}
+              />
+            </GestureHandlerRootView>
+          ) : (
+            <FlashList
+              contentContainerStyle={contentContainerStyle}
+              estimatedItemSize={150}
+              estimatedListSize={{ height, width }}
+              showsVerticalScrollIndicator={false}
+              data={calendar.months}
+              keyExtractor={(item) => String(item.id)}
+              renderItem={({ item: month, index }) => {
+                return (
+                  <View key={`${month.id}${index}`}>
+                    <Month
+                      month={month}
+                      bookingDayHandler={bookingDayHandler}
+                      setPeriod={setPeriod}
+                      withInteraction={withInteraction}
+                      hasCompletedRange={hasCompletedRange}
+                      rangeMarkerHandler={rangeMarkerHandler}
+                      resetCalendar={resetCalendar}
+                      calendar={calendar}
+                      bookingColors={newCalendar.presenter.vm.bookingColors}
+                      periodIsValid={periodIsValid}
+                      setPeriodIsValid={setPeriodIsValid}
+                      setDaysSelected={setDaysSelected}
+                      setNextDay={setNextDay}
+                      daysSelected={daysSelected}
+                      periodRules={periodRules}
+                      defaultMinimumDuration={defaultMinimumDuration}
+                    />
+                  </View>
+                );
+              }}
+            />
+          )}
         </View>
       </View>
     );
