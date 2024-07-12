@@ -1,6 +1,13 @@
 import { DayRuleType } from "./periodRules";
 
-export type TypeBookingFormatted = "other" | "owner" | "option" | "contract";
+export type TypeBookingFormatted =
+  | "calendar"
+  | "clientoption"
+  | "contract"
+  | "option"
+  | "other"
+  | "owner"
+  | "salesoption";
 
 export type TypeBooking =
   | "Bookings::Admin"
